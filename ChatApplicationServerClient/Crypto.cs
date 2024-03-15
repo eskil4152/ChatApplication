@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ChatApplicationServerClient
 {
-    public class Crypto
+    static class Crypto
     {
         public static string Encrypt(string s, string key)
         {

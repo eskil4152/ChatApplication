@@ -15,6 +15,7 @@
 
       ws.addEventListener("open", function (event) {
         console.log("Conntected to WebSocket server");
+        output.innerHTML = event.data;
       });
 
       ws.addEventListener("message", function (event) {
@@ -24,6 +25,7 @@
 
       ws.addEventListener("close", function (event) {
         console.log("Disconnected from WebSocket server");
+        output.innerHTML = event.data;
       });
 
       ws.addEventListener("error", function (event) {

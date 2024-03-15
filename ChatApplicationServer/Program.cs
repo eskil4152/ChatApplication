@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-
 TcpListener server = CreateServer.GetTcpListener();
 server.Start();
 Console.WriteLine("Server started. Waiting for connections \r\n");
@@ -30,17 +29,6 @@ static async Task HandleClientAsync(TcpClient client)
 {
     Console.WriteLine("Client connected\r\n");
     await GoToRoomAsync(1, client, client.GetStream());
-
-    /*NetworkStream stream = client.GetStream();
-
-    while (!stream.DataAvailable) ;
-    while (client.Available < 3) ;
-
-    byte[] roomBytes = new byte[client.Available];
-    await stream.ReadAsync(roomBytes, 0, roomBytes.Length);
-
-    string roomString = Encoding.UTF8.GetString(roomBytes);
-    var res = JsonSerializer.Deserialize<HttpMessage>(roomString);*/
 }
 
 static async Task GoToRoomAsync(int? roomNumber, TcpClient client, NetworkStream stream)
