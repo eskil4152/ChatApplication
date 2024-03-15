@@ -10,11 +10,14 @@ namespace ChatApplicationServerClient
     {
         public static async Task Main()
         {
+            Console.WriteLine("Username:");
+            string username = VerifyInputString();
+
+            Console.WriteLine("Which room do you want to enter?");
+            int room = VerifyInputInteger();
+
             var hostIp = "192.168.0.135";
             int hostPort = 8081;
-
-            Console.WriteLine("Username:");
-            string? username = Console.ReadLine();
 
             try
             {
@@ -24,7 +27,7 @@ namespace ChatApplicationServerClient
                 NetworkStream stream = client.GetStream();
 
                 Task readTask = ReadFromServerAsync(stream);
-                Task writeTask = WriteToServerAsync(stream, username);
+                Task writeTask = WriteToServerAsync(stream, username, room);
 
                 await Task.WhenAll(readTask, writeTask);
             }
@@ -56,7 +59,7 @@ namespace ChatApplicationServerClient
             }
         }
 
-        private static async Task WriteToServerAsync(NetworkStream stream, string? username)
+        private static async Task WriteToServerAsync(NetworkStream stream, string username, int room)
         {
             try
             {
@@ -68,7 +71,7 @@ namespace ChatApplicationServerClient
                     {
                         Username = username,
                         Password = "password",
-                        RoomNumber = 1,
+                        RoomNumber = room,
                         Message = messageInput
                     };
 
@@ -82,6 +85,36 @@ namespace ChatApplicationServerClient
             catch (Exception e)
             {
                 Console.WriteLine("Error writing to server: {0}", e.Message);
+            }
+        }
+
+        public static string VerifyInputString()
+        {
+            while (true)
+            {
+                string? input = Console.ReadLine();
+
+                if (!String.IsNullOrEmpty(input))
+                {
+                    return input;
+                }
+
+                Console.WriteLine("Please enter a valid input");
+            }
+        }
+
+        public static int VerifyInputInteger()
+        {
+            while (true)
+            {
+                string? input = Console.ReadLine();
+                                
+                if (!String.IsNullOrEmpty(input) && int.TryParse(input, out int output) )
+                {
+                    return output;    
+                }
+
+                Console.WriteLine("Please enter a valid number");
             }
         }
     }
