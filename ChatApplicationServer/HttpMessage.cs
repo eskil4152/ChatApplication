@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace ChatApplicationServer
-{
+
     public class HttpMessage
     {
         public string? Username { get; set; }
@@ -9,4 +8,3 @@ namespace ChatApplicationServer
         public string? Message { get; set; }
         public int? RoomNumber { get; set; }
     }
-}
