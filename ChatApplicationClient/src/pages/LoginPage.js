@@ -32,15 +32,7 @@ export default function LoginPage() {
         <button>Confirm</button>
       </form>
 
-      <Link to={"/test"}>BUTTON</Link>
-
-      {loggedIn ? (
-        <div>
-          <p>Logged in</p>
-        </div>
-      ) : (
-        ""
-      )}
+      {loggedIn ? <Link to={"/room"}>Access room</Link> : ""}
     </div>
   );
 }
