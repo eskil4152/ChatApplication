@@ -16,7 +16,7 @@ namespace ChatApplicationServerClient
             Console.WriteLine("Which room do you want to enter?");
             int room = VerifyInputInteger();
 
-            var hostIp = "192.168.0.135";
+            var hostIp = "";
             int hostPort = 8081;
 
             try

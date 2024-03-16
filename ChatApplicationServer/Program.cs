@@ -32,8 +32,6 @@ static async Task GoToRoomAsync(int roomNumber, TcpClient client, NetworkStream 
 {
     RoomActions.AddToRoom(client, roomNumber);
 
-    Console.WriteLine("Hello");
-
     try
     {
         while (true)
@@ -42,7 +40,6 @@ static async Task GoToRoomAsync(int roomNumber, TcpClient client, NetworkStream 
             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
             if (bytesRead == 0)
             {
-                // Client disconnected
                 break;
             }
 
