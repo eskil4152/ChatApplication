@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 TcpListener server = CreateServer.GetTcpListener();
 server.Start();
@@ -27,14 +24,13 @@ try
 
 static async Task HandleClientAsync(TcpClient client)
 {
-    Console.WriteLine("Client connected\r\n");
+    Console.WriteLine("Client {0} connected\r\n", client.Client.RemoteEndPoint.ToString());
     await GoToRoomAsync(1, client, client.GetStream());
 }
 
-static async Task GoToRoomAsync(int? roomNumber, TcpClient client, NetworkStream stream)
+static async Task GoToRoomAsync(int roomNumber, TcpClient client, NetworkStream stream)
 {
-    int room = (int)roomNumber;
-    RoomActions.AddToRoom(client, room);
+    RoomActions.AddToRoom(client, roomNumber);
 
     Console.WriteLine("Hello");
 
@@ -51,9 +47,39 @@ static async Task GoToRoomAsync(int? roomNumber, TcpClient client, NetworkStream
             }
 
             string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            var deserializedMessage = JsonSerializer.Deserialize<HttpMessage>(message);
 
-            RoomActions.PostToRoom(client, room, deserializedMessage!);
+            if (message.TrimStart().StartsWith("{"))
+            {
+                try
+                {
+                    var deserializedMessage = JsonSerializer.Deserialize<HttpMessage>(message);
+                    RoomActions.PostToRoom(client, roomNumber, deserializedMessage!);
+                } catch (Exception e)
+                {
+                    Console.WriteLine("Error: " + e.Message);
+                }
+            } else
+            {
+                int bodyStartIndex = message.IndexOf("\r\n\r\n") + 4;
+
+                if (bodyStartIndex >= 0 && bodyStartIndex < message.Length)
+                {
+                    try
+                    {
+                        string body = message.Substring(bodyStartIndex);
+                        var deserializedMessage = JsonSerializer.Deserialize<HttpMessage>(body);
+                        RoomActions.PostToRoom(client, roomNumber, deserializedMessage!);
+                        Console.WriteLine("Received HTTP Request Body:\n" + body);
+                    } catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to extract body, " + e.Message);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("HTTP Request does not contain a body.");
+                }
+            }
         }
     }
     catch (Exception ex)
@@ -62,7 +88,7 @@ static async Task GoToRoomAsync(int? roomNumber, TcpClient client, NetworkStream
     }
     finally
     {
-        RoomActions.RemoveFromRoom(client, (int)roomNumber);
+        RoomActions.RemoveFromRoom(client, roomNumber);
         client.Close();
         Console.WriteLine("Client disconnected");
     }
