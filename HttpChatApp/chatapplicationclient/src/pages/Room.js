@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Room() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -8,7 +8,7 @@ export default function Room() {
   const [message, setMessage] = useState("");
   const username = "User One";
 
-  var nextId = 1;
+  var nextId = useRef(1);
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8083");
@@ -25,7 +25,7 @@ export default function Room() {
         setChats((prevChats) => [
           ...prevChats,
           {
-            id: nextId++,
+            id: nextId.current++,
             username: serverMessage.username,
             value: serverMessage.message,
           },
@@ -61,7 +61,13 @@ export default function Room() {
 
   function handleSendMessage() {
     if (socket && loggedIn) {
-      socket.send(JSON.stringify({ Username: username, Message: message }));
+      const payload = {
+        Type: "CHAT",
+        Username: username,
+        Message: message,
+      };
+
+      socket.send(JSON.stringify(payload));
     }
   }
 

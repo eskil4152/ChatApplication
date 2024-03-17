@@ -40,7 +40,7 @@ namespace ChatApplicationServerHttp
                 {
                     RoomActions.AddToRoom(webSocket, 1);
 
-                    ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
+                    ArraySegment<byte> buffer = new(new byte[1024]);
                     WebSocketReceiveResult result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
 
                     if (result.MessageType == WebSocketMessageType.Text)
@@ -48,12 +48,30 @@ namespace ChatApplicationServerHttp
                         string message = Encoding.UTF8.GetString(buffer.Array, 0, result.Count);
                         var deserializedMessage = JsonSerializer.Deserialize<HttpMessage>(message);
 
-                        RoomActions.PostToRoom(1, deserializedMessage);
+                        switch (deserializedMessage.Type)
+                        {
+                            case MessageType.CHAT:
+                                Console.WriteLine("Chat received");
+                                RoomActions.PostToRoom(1, deserializedMessage);
+                                break;
+                            case MessageType.LOGIN:
+                                Console.WriteLine("Type login");
+                                break;
+                            case MessageType.ROOMSELECT:
+                                Console.WriteLine("Type room select");
+                                break;
+                            case MessageType.KEY:
+                                Console.WriteLine("Type key");
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
                         RoomActions.RemoveFromRoom(webSocket, 1);
+                        break;
                     }
                 }
             }

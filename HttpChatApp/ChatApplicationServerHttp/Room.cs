@@ -48,8 +48,6 @@ namespace ChatApplicationServerHttp
 
                 rooms.Add(roomNumber, newRoom);
             }
-
-            Console.WriteLine("ADDED TO ROOM");
         }
 
         public static Room GetRoom(int roomNumber)
@@ -59,14 +57,12 @@ namespace ChatApplicationServerHttp
 
         public static void PostToRoom(int roomNumber, HttpMessage message)
         {
-            Console.WriteLine("POSTED");
             _ = UpdateRoomAsync(roomNumber, message.Username, message.Message);
         }
 
         private static async Task UpdateRoomAsync(int roomNumber, string user, string message)
         {
             Room room = rooms[roomNumber];
-            Console.WriteLine("Got room");
 
             foreach (WebSocket client in room.Members)
             {
