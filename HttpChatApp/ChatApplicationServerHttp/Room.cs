@@ -84,7 +84,6 @@ namespace ChatApplicationServerHttp
         public static void PostToRoom(int roomNumber, HttpMessage message)
         {
             _ = UpdateRoomAsync(roomNumber, message.Username, message.Message);
-            Console.WriteLine("Size: " + rooms[roomNumber].Messages.Count);
         }
 
         private static async Task UpdateRoomAsync(int roomNumber, string user, string message)

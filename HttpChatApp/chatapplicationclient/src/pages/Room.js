@@ -6,7 +6,7 @@ export default function Room() {
 
   const [message, setMessage] = useState("");
 
-  const [username, setUsername] = useState("Gubbe");
+  const [username, setUsername] = useState("");
   const [usernameTmp, setUsernameTmp] = useState("");
 
   let nextId = 0;
@@ -57,7 +57,7 @@ export default function Room() {
   }, [chats]);
 
   function handleSendMessage() {
-    if (socket) {
+    if (socket && message && !(message === "")) {
       const payload = {
         Type: "CHAT",
         Username: username,
@@ -67,6 +67,8 @@ export default function Room() {
       socket.send(JSON.stringify(payload));
 
       setMessage("");
+    } else {
+      console.log("ENTER SOMETHING");
     }
   }
 

@@ -6,10 +6,10 @@ public struct HttpMessage
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required MessageType Type { get; set; }
-    public string? Username { get; set; }
+    public required string Username { get; set; }
     public string? Password { get; set; }
     public string? key { get; set; }
-    public string? Message { get; set; }
+    public required string Message { get; set; }
     public int? RoomNumber { get; set; }
 }
 

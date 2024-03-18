@@ -19,7 +19,7 @@ namespace ChatApplicationServerHttp
                 HttpListenerContext context = await listener.GetContextAsync();
                 if (context.Request.IsWebSocketRequest)
                 {
-                    ProcessWebSocketRequest(context);
+                    await ProcessWebSocketRequest(context);
                 }
                 else
                 {
