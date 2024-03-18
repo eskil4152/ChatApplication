@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Room() {
-  const [loggedIn, setLoggedIn] = useState(false);
   const [chats, setChats] = useState([]);
   const [socket, setSocket] = useState(null);
 
   const [message, setMessage] = useState("");
-  const username = "User One";
 
-  var nextId = useRef(1);
+  const [username, setUsername] = useState("");
+  const [usernameTmp, setUsernameTmp] = useState("");
+
+  let nextId = 0;
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8083");
+    const ws = new WebSocket("ws://192.168.0.135:8083");
 
     ws.onopen = () => {
       console.log("Connected to ws");
@@ -25,7 +26,7 @@ export default function Room() {
         setChats((prevChats) => [
           ...prevChats,
           {
-            id: nextId.current++,
+            id: nextId++,
             username: serverMessage.username,
             value: serverMessage.message,
           },
@@ -55,12 +56,8 @@ export default function Room() {
     console.log("Updated chats:", chats);
   }, [chats]);
 
-  function handleLogin() {
-    setLoggedIn(true);
-  }
-
   function handleSendMessage() {
-    if (socket && loggedIn) {
+    if (socket) {
       const payload = {
         Type: "CHAT",
         Username: username,
@@ -68,23 +65,25 @@ export default function Room() {
       };
 
       socket.send(JSON.stringify(payload));
+
+      setMessage("");
     }
   }
 
   return (
     <div>
-      {loggedIn ? (
+      {!(username.length <= 1) ? (
         <div>
           {socket ? (
             <div>
               <h1>Hello</h1>
-              <ul>
-                {chats.map((chat, index) => (
-                  <li key={index}>
+              <div>
+                {chats.map((chat) => (
+                  <p key={chat.id}>
                     {chat.username}: {chat.value}
-                  </li>
+                  </p>
                 ))}
-              </ul>
+              </div>
 
               <input
                 type="text"
@@ -102,8 +101,19 @@ export default function Room() {
         </div>
       ) : (
         <div>
-          <p>You are not authorized</p>
-          <button onClick={handleLogin}>Log In</button>
+          <p>Set username</p>
+
+          <input
+            value={usernameTmp}
+            onChange={(e) => setUsernameTmp(e.target.value)}
+          ></input>
+          <button
+            onClick={() => {
+              setUsername(usernameTmp);
+            }}
+          >
+            Confirm
+          </button>
         </div>
       )}
     </div>

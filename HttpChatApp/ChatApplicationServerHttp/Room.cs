@@ -2,9 +2,7 @@
 using System.Text;
 
 namespace ChatApplicationServerHttp
-
 {
-
     public struct Room
     {
         public string RoomName { get; set; }
@@ -66,15 +64,21 @@ namespace ChatApplicationServerHttp
 
             foreach (WebSocket client in room.Members)
             {
-                try
+                if (client.State == WebSocketState.Open)
                 {
-                    string jsonMessage = "{\"username\":\"" + user + "\", \"message\":\"" + message + "\"}";
-                    await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(jsonMessage)),
-                        WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-                catch (Exception ex)
+                    try
+                    {
+                        string jsonMessage = "{\"username\":\"" + user + "\", \"message\":\"" + message + "\"}";
+                        await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(jsonMessage)),
+                            WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error broadcasting message to client: {ex.Message}");
+                    }
+                } else
                 {
-                    Console.WriteLine($"Error broadcasting message to client: {ex.Message}");
+                    RemoveFromRoom(client, 1);
                 }
             }
         }

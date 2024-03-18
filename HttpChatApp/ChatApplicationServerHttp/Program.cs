@@ -10,7 +10,7 @@ namespace ChatApplicationServerHttp
         public static async Task Main()
         {
             HttpListener listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:8083/");
+            listener.Prefixes.Add("http://192.168.0.135:8083/");
             listener.Start();
             Console.WriteLine("Listening for WebSocket connections...");
 
@@ -34,12 +34,15 @@ namespace ChatApplicationServerHttp
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
 
+            string ip = context.Request.RemoteEndPoint.Address.ToString();
+            Console.WriteLine("Connected {0}", ip);
+
             try
             {
+                RoomActions.AddToRoom(webSocket, 1);
+
                 while (webSocket.State == WebSocketState.Open)
                 {
-                    RoomActions.AddToRoom(webSocket, 1);
-
                     ArraySegment<byte> buffer = new(new byte[1024]);
                     WebSocketReceiveResult result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
 
