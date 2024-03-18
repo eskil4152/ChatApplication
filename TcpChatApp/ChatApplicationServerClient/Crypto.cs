@@ -2,8 +2,9 @@
 using System.Security.Cryptography;
 using System.Text;
 
-
-    public class Crypto
+namespace ChatApplicationServerClient
+{
+    static class Crypto
     {
         public static string Encrypt(string s, string key)
         {
@@ -59,5 +60,5 @@ using System.Text;
             }
         }
     }
-
+}
 
