@@ -6,7 +6,7 @@ export default function Room() {
 
   const [message, setMessage] = useState("");
 
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Gubbe");
   const [usernameTmp, setUsernameTmp] = useState("");
 
   let nextId = 0;

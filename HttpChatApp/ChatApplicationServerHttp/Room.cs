@@ -10,6 +10,7 @@ namespace ChatApplicationServerHttp
         public string RoomPassword { get; set; }
         public string RoomSecret { get; set; }
         public List<WebSocket> Members { get; set; }
+        public List<string> Messages { get; set; }
     }
 
     public static class RoomActions
@@ -22,6 +23,30 @@ namespace ChatApplicationServerHttp
             room.Members.Remove(client);
         }
 
+        public static async Task UpdateUsersMessagesAsync(WebSocket client, Room room)
+        {
+            try
+            {
+                foreach (string msg in room.Messages)
+                {
+                    if (client == null || client.State != WebSocketState.Open)
+                    {
+                        Console.WriteLine("Client is null or connection is not open.");
+                    }
+                    else
+                    {
+                        await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)),
+                            WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message to client: {ex.Message}");
+            }
+        }
+
+
         public static void AddToRoom(WebSocket client, int roomNumber)
         {
             if (rooms.ContainsKey(roomNumber))
@@ -30,6 +55,8 @@ namespace ChatApplicationServerHttp
                 room.Members ??= new List<WebSocket>();
 
                 rooms[roomNumber].Members.Add(client);
+
+                _ = UpdateUsersMessagesAsync(client, room);
             }
             else
             {
@@ -37,12 +64,13 @@ namespace ChatApplicationServerHttp
                 {
                     RoomName = "",
                     RoomPassword = "",
-                    RoomSecret = ""
+                    RoomSecret = "",
+                    Members = new List<WebSocket>()
+                    {
+                        client
+                    },
+                    Messages = new List<string>()
                 };
-                newRoom.Members = new List<WebSocket>
-            {
-                client
-            };
 
                 rooms.Add(roomNumber, newRoom);
             }
@@ -56,11 +84,17 @@ namespace ChatApplicationServerHttp
         public static void PostToRoom(int roomNumber, HttpMessage message)
         {
             _ = UpdateRoomAsync(roomNumber, message.Username, message.Message);
+            Console.WriteLine("Size: " + rooms[roomNumber].Messages.Count);
         }
 
         private static async Task UpdateRoomAsync(int roomNumber, string user, string message)
         {
             Room room = rooms[roomNumber];
+            string jsonMessage = "{\"username\":\"" + user + "\", \"message\":\"" + message + "\"}";
+
+            room.Messages ??= new List<string>();
+
+            room.Messages.Add(jsonMessage);
 
             foreach (WebSocket client in room.Members)
             {
@@ -68,7 +102,6 @@ namespace ChatApplicationServerHttp
                 {
                     try
                     {
-                        string jsonMessage = "{\"username\":\"" + user + "\", \"message\":\"" + message + "\"}";
                         await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(jsonMessage)),
                             WebSocketMessageType.Text, true, CancellationToken.None);
                     }
