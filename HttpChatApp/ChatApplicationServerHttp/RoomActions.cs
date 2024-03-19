@@ -1,18 +1,9 @@
-﻿using System.Net.WebSockets;
+﻿using System;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace ChatApplicationServerHttp
 {
-    public struct Room
-    {
-        public string RoomName { get; set; }
-        public int RoomNumber { get; set; }
-        public string RoomPassword { get; set; }
-        public string RoomSecret { get; set; }
-        public List<WebSocket> Members { get; set; }
-        public List<string> Messages { get; set; }
-    }
-
     public static class RoomActions
     {
         private static readonly Dictionary<int, Room> rooms = new();
@@ -108,7 +99,8 @@ namespace ChatApplicationServerHttp
                     {
                         Console.WriteLine($"Error broadcasting message to client: {ex.Message}");
                     }
-                } else
+                }
+                else
                 {
                     RemoveFromRoom(client, 1);
                 }
@@ -116,4 +108,3 @@ namespace ChatApplicationServerHttp
         }
     }
 
-}

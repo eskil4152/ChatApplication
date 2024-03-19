@@ -7,9 +7,46 @@ namespace ChatApplicationServerHttp
 {
     class Program
     {
-        public static async Task Main()
+        private readonly DatabaseService databaseService;
+
+        public Program(DatabaseService databaseService)
         {
-            HttpListener listener = new HttpListener();
+            this.databaseService = databaseService;
+        }
+
+        // Return all of the users saved rooms
+        public void CreateUser(LoginMessage loginMessage, WebSocket webSocket)
+        {
+            if (loginMessage.LoginType == LoginType.LOGIN)
+            {
+                User? user = databaseService.CheckUser(loginMessage.Username, loginMessage.Password);
+
+                if (user == null)
+                {
+                    Console.WriteLine("Return rooms");
+                } else
+                {
+                    Console.WriteLine("");
+                }
+            } else if (loginMessage.LoginType == LoginType.REGISTER)
+            {
+                User user = new()
+                {
+                    Username = loginMessage.Username,
+                    Password = Password.HashPassword(loginMessage.Password),
+                    Rooms = new List<Room>(),
+                };
+
+                databaseService.Register(user);
+            } else
+            {
+                Console.WriteLine("Invalid login type: " + loginMessage.LoginType);
+            }
+        }
+
+        public async Task Main()
+        {
+            HttpListener listener = new();
             listener.Prefixes.Add("http://192.168.0.135:8083/");
             listener.Start();
             Console.WriteLine("Listening for WebSocket connections...");
@@ -29,7 +66,7 @@ namespace ChatApplicationServerHttp
             }
         }
 
-        static async Task ProcessWebSocketRequest(HttpListenerContext context)
+        async Task ProcessWebSocketRequest(HttpListenerContext context)
         {
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
@@ -39,8 +76,6 @@ namespace ChatApplicationServerHttp
 
             try
             {
-                RoomActions.AddToRoom(webSocket, 1);
-
                 while (webSocket.State == WebSocketState.Open)
                 {
                     ArraySegment<byte> buffer = new(new byte[1024]);
@@ -51,17 +86,29 @@ namespace ChatApplicationServerHttp
                         string message = Encoding.UTF8.GetString(buffer.Array, 0, result.Count);
                         var deserializedMessage = JsonSerializer.Deserialize<HttpMessage>(message);
 
-                        switch (deserializedMessage.Type)
+                        switch (deserializedMessage?.Type)
                         {
                             case MessageType.CHAT:
                                 Console.WriteLine("Chat received");
-                                RoomActions.PostToRoom(1, deserializedMessage);
+                                ChatMessage? chatMessage = JsonSerializer.Deserialize<ChatMessage>(message);
+
+                                if (chatMessage != null)
+                                {
+                                    RoomActions.PostToRoom(1, chatMessage);
+                                    Console.WriteLine("Post chat ok");
+                                }
                                 break;
                             case MessageType.LOGIN:
-                                Console.WriteLine("Type login");
+                                LoginMessage? loginMessage = JsonSerializer.Deserialize<LoginMessage>(message);
+
+                                if (loginMessage != null)
+                                {
+                                    CreateUser(loginMessage, webSocket);
+                                    Console.WriteLine("Login ok");
+                                }
                                 break;
-                            case MessageType.ROOMSELECT:
-                                Console.WriteLine("Type room select");
+                            case MessageType.JOINROOM:
+                                Console.WriteLine("Type join room");
                                 break;
                             case MessageType.KEY:
                                 Console.WriteLine("Type key");

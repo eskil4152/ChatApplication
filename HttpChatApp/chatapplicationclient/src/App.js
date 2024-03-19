@@ -6,13 +6,15 @@ import Room from "./pages/Room";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Room />} />
-        <Route path="/test" element={<TestPage />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-    </BrowserRouter>
+    <WebSocketProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Room />} />
+          <Route path="/test" element={<TestPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </BrowserRouter>
+    </WebSocketProvider>
   );
 }
 
