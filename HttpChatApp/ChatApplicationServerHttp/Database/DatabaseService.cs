@@ -10,6 +10,33 @@ namespace ChatApplicationServerHttp
             this.databaseContext = databaseContext;
 		}
 
+		public bool CreateRoom(Room room)
+		{
+            if (databaseContext.rooms.FirstOrDefault(u => u.RoomName == room.RoomName) != null)
+			{
+				return false;
+			}
+
+			databaseContext.rooms.Add(room);
+			databaseContext.SaveChanges();
+			return true;
+		}
+
+		public bool JoinRoom(RoomMessage roomMessage)
+		{
+			Room? room = databaseContext.rooms.FirstOrDefault(u => u.RoomName == roomMessage.RoomName);
+
+			if (room != null && room.RoomPassword == roomMessage.RoomPassword)
+			{
+				room.Members.Add(roomMessage.Username);
+				databaseContext.SaveChanges();
+
+				return true;
+			}
+
+			return false;
+		}
+
         public bool Register(User user)
 		{
 			if (databaseContext.users.FirstOrDefault(u => u.Username == user.Username) != null)
@@ -22,7 +49,7 @@ namespace ChatApplicationServerHttp
 			return true;
 		}
 
-		public User? CheckUser(string username, string password)
+		public User? Login(string username, string password)
 		{
 			// find by username
 			// check found user with provided user password

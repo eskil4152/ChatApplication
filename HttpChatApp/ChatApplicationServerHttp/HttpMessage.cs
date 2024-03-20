@@ -17,13 +17,12 @@ public class LoginMessage
     public required string Password { get; set; }
 }
 
-public class Other
+public class RoomMessage
 {
+    public required RoomType RoomType { get; set; }
+    public string? RoomName { get; set; }
+    public string? RoomPassword { get; set; }
     public required string Username { get; set; }
-    public string? Password { get; set; }
-    public string? key { get; set; }
-    public required string Message { get; set; }
-    public int? RoomNumber { get; set; }
 }
 
 public enum LoginType
@@ -32,6 +31,14 @@ public enum LoginType
     LOGIN,
     [EnumMember(Value = "REGISTER")]
     REGISTER
+}
+
+public enum RoomType
+{
+    [EnumMember(Value = "JOIN")]
+    JOIN,
+    [EnumMember(Value = "CREATE")]
+    CREATE
 }
 
 public enum MessageType

@@ -8,6 +8,8 @@ namespace ChatApplicationServerHttp
         public Room()
         {
             Id = Guid.NewGuid();
+            Members = new List<string>();
+            Members = new List<string>();
         }
 
         [Key]
@@ -17,7 +19,7 @@ namespace ChatApplicationServerHttp
 
         // Use websocket only for active members
         //public List<WebSocket>? MembersActive { get; set; }
-        public List<User>? Members { get; set; }
-        public List<string>? Messages { get; set; }
+        public required List<string> Members { get; set; }
+        public required List<string> Messages { get; set; }
     }
 }

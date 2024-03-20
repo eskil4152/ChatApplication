@@ -5,7 +5,7 @@ namespace ChatApplicationServerHttp
 {
 	public class UserActions
 	{
-        public static List<Room>? CreateUser(DatabaseService databaseService, LoginMessage loginMessage)
+        public static List<Room>? LoginRegister(DatabaseService databaseService, LoginMessage loginMessage)
         {
             if (loginMessage.LoginType == LoginType.LOGIN)
             {

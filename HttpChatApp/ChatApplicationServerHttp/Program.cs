@@ -73,11 +73,9 @@ namespace ChatApplicationServerHttp
 
                                     if (loginMessage != null)
                                     {
-                                        List<Room>? rooms = UserActions.CreateUser(databaseService, loginMessage);
+                                        List<Room>? rooms = UserActions.LoginRegister(databaseService, loginMessage);
                                         if (rooms != null)
                                         {
-                                            Console.WriteLine("Able to log in");
-
                                             var json = new
                                             {
                                                 StatusCode = 200,
@@ -89,8 +87,6 @@ namespace ChatApplicationServerHttp
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Unable to log in");
-
                                             var json = new
                                             {
                                                 StatusCode = 401,
@@ -104,7 +100,27 @@ namespace ChatApplicationServerHttp
                                     break;
 
                                 case "JOINROOM":
-                                    Console.WriteLine("Type join room");
+                                    RoomMessage? roomMessage = JsonSerializer.Deserialize<RoomMessage>(message);
+                                    if (roomMessage != null)
+                                    {
+                                        var json = new
+                                        {
+                                            StatusCode = RoomActions.AddToRoom(databaseService, roomMessage) ? 200 : 401,
+                                        };
+                                        
+                                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(json))),
+                                                        WebSocketMessageType.Text, true, CancellationToken.None);
+                                    }
+                                    else
+                                    {
+                                        var json = new
+                                        {
+                                            StatusCode = 401,
+                                        };
+
+                                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(json))),
+                                                        WebSocketMessageType.Text, true, CancellationToken.None);
+                                    }
                                     break;
 
                                 case "KEY":

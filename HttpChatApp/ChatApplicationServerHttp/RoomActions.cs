@@ -44,37 +44,44 @@ namespace ChatApplicationServerHttp
         }
 
 
-        public static void AddToRoom(WebSocket client, int roomNumber)
+        public static bool AddToRoom(DatabaseService databaseService, RoomMessage roomMessage)
         {
-            if (rooms.ContainsKey(roomNumber))
+            if (roomMessage.RoomType == RoomType.JOIN)
             {
-                Room room = rooms[roomNumber];
-                //room.MembersActive ??= new List<WebSocket>();
+                if (databaseService.JoinRoom(roomMessage))
+                {
+                    Console.WriteLine("Joined");
 
-                //rooms[roomNumber].MembersActive.Add(client);
-
-
-                _ = UpdateUsersMessagesAsync(client, room);
+                    return true;
+                } else
+                {
+                    Console.WriteLine("Unable to join");
+                }
             }
-            else
+            else if (roomMessage.RoomType == RoomType.CREATE)
             {
                 Room newRoom = new()
                 {
-                    RoomName = "",
-                    RoomPassword = "",
+                    RoomName = roomMessage.RoomName,
+                    RoomPassword = roomMessage.RoomPassword,
                     /*MembersActive = new List<WebSocket>()
                     {
                         client
                     },*/
-                    Members = new List<User>()
+                    Members = new List<string>()
                     {
-                        //TODO: Adds user to room when joining
+                        roomMessage.Username
                     },
                     Messages = new List<string>()
                 };
 
-                rooms.Add(roomNumber, newRoom);
+                if (databaseService.CreateRoom(newRoom))
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
 
         public static Room GetRoom(int roomNumber)
