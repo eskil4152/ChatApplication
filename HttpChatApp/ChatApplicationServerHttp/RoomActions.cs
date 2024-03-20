@@ -10,8 +10,14 @@ namespace ChatApplicationServerHttp
 
         public static void RemoveFromRoom(WebSocket client, int roomNumber)
         {
-            Room room = rooms[roomNumber];
-            room.Members.Remove(client);
+            try
+            {
+                Room room = rooms[roomNumber];
+                room.MembersActive.Remove(client);
+            } catch
+            {
+                Console.WriteLine("");
+            }
         }
 
         public static async Task UpdateUsersMessagesAsync(WebSocket client, Room room)
@@ -43,9 +49,10 @@ namespace ChatApplicationServerHttp
             if (rooms.ContainsKey(roomNumber))
             {
                 Room room = rooms[roomNumber];
-                room.Members ??= new List<WebSocket>();
+                room.MembersActive ??= new List<WebSocket>();
 
-                rooms[roomNumber].Members.Add(client);
+                rooms[roomNumber].MembersActive.Add(client);
+
 
                 _ = UpdateUsersMessagesAsync(client, room);
             }
@@ -56,9 +63,13 @@ namespace ChatApplicationServerHttp
                     RoomName = "",
                     RoomPassword = "",
                     RoomSecret = "",
-                    Members = new List<WebSocket>()
+                    MembersActive = new List<WebSocket>()
                     {
                         client
+                    },
+                    Members = new List<User>()
+                    {
+                        //TODO: Adds user to room
                     },
                     Messages = new List<string>()
                 };
@@ -72,8 +83,9 @@ namespace ChatApplicationServerHttp
             return rooms[roomNumber];
         }
 
-        public static void PostToRoom(int roomNumber, HttpMessage message)
+        public static void PostToRoom(int roomNumber, ChatMessage message)
         {
+            //TODO: Check if user actually exists in room
             _ = UpdateRoomAsync(roomNumber, message.Username, message.Message);
         }
 
@@ -86,7 +98,7 @@ namespace ChatApplicationServerHttp
 
             room.Messages.Add(jsonMessage);
 
-            foreach (WebSocket client in room.Members)
+            foreach (WebSocket client in room.MembersActive)
             {
                 if (client.State == WebSocketState.Open)
                 {
@@ -107,4 +119,4 @@ namespace ChatApplicationServerHttp
             }
         }
     }
-
+}

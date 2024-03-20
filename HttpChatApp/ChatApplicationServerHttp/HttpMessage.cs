@@ -2,34 +2,22 @@
 using System.Text.Json.Serialization;
 using System.Runtime.Serialization;
 
-public abstract class HttpMessage
+public class ChatMessage
+{
+    public required string Username { get; set; }
+    public required string Message { get; set; }
+    public int? RoomNumber { get; set; }
+}
+
+public class LoginMessage
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required MessageType Type { get; set; }
-    /*
-    public required string Username { get; set; }
-    public string? Password { get; set; }
-    public string? key { get; set; }
-    public required string Message { get; set; }
-    public int? RoomNumber { get; set; }
-    */
-}
-
-public class ChatMessage : HttpMessage
-{
-    public required string Username { get; set; }
-    public required string Message { get; set; }
-    public int? RoomNumber { get; set; }
-}
-
-public class LoginMessage : HttpMessage
-{
     public required LoginType LoginType { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
 }
 
-public class Other : HttpMessage
+public class Other
 {
     public required string Username { get; set; }
     public string? Password { get; set; }

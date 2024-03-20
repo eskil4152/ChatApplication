@@ -7,45 +7,10 @@ namespace ChatApplicationServerHttp
 {
     class Program
     {
-        private readonly DatabaseService databaseService;
-
-        public Program(DatabaseService databaseService)
+        static async Task Main()
         {
-            this.databaseService = databaseService;
-        }
+            DatabaseService databaseService = new(new DatabaseContext());
 
-        // Return all of the users saved rooms
-        public void CreateUser(LoginMessage loginMessage, WebSocket webSocket)
-        {
-            if (loginMessage.LoginType == LoginType.LOGIN)
-            {
-                User? user = databaseService.CheckUser(loginMessage.Username, loginMessage.Password);
-
-                if (user == null)
-                {
-                    Console.WriteLine("Return rooms");
-                } else
-                {
-                    Console.WriteLine("");
-                }
-            } else if (loginMessage.LoginType == LoginType.REGISTER)
-            {
-                User user = new()
-                {
-                    Username = loginMessage.Username,
-                    Password = Password.HashPassword(loginMessage.Password),
-                    Rooms = new List<Room>(),
-                };
-
-                databaseService.Register(user);
-            } else
-            {
-                Console.WriteLine("Invalid login type: " + loginMessage.LoginType);
-            }
-        }
-
-        public async Task Main()
-        {
             HttpListener listener = new();
             listener.Prefixes.Add("http://192.168.0.135:8083/");
             listener.Start();
@@ -56,7 +21,7 @@ namespace ChatApplicationServerHttp
                 HttpListenerContext context = await listener.GetContextAsync();
                 if (context.Request.IsWebSocketRequest)
                 {
-                    await ProcessWebSocketRequest(context);
+                    await ProcessWebSocketRequest(databaseService, context);
                 }
                 else
                 {
@@ -66,7 +31,7 @@ namespace ChatApplicationServerHttp
             }
         }
 
-        async Task ProcessWebSocketRequest(HttpListenerContext context)
+        static async Task ProcessWebSocketRequest(DatabaseService databaseService, HttpListenerContext context)
         {
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
@@ -84,37 +49,70 @@ namespace ChatApplicationServerHttp
                     if (result.MessageType == WebSocketMessageType.Text)
                     {
                         string message = Encoding.UTF8.GetString(buffer.Array, 0, result.Count);
-                        var deserializedMessage = JsonSerializer.Deserialize<HttpMessage>(message);
 
-                        switch (deserializedMessage?.Type)
+                        JsonElement parsedMessage = JsonDocument.Parse(message).RootElement;
+                        if (parsedMessage.TryGetProperty("Type", out JsonElement jsonElement))
                         {
-                            case MessageType.CHAT:
-                                Console.WriteLine("Chat received");
-                                ChatMessage? chatMessage = JsonSerializer.Deserialize<ChatMessage>(message);
+                            switch (jsonElement.ToString())
+                            {
+                                case "CHAT":
+                                    Console.WriteLine("Chat received");
+                                    ChatMessage? chatMessage = JsonSerializer.Deserialize<ChatMessage>(message);
 
-                                if (chatMessage != null)
-                                {
-                                    RoomActions.PostToRoom(1, chatMessage);
-                                    Console.WriteLine("Post chat ok");
-                                }
-                                break;
-                            case MessageType.LOGIN:
-                                LoginMessage? loginMessage = JsonSerializer.Deserialize<LoginMessage>(message);
+                                    if (chatMessage != null)
+                                    {
+                                        RoomActions.PostToRoom(1, chatMessage);
+                                        Console.WriteLine("Post chat ok");
+                                    }
+                                    break;
 
-                                if (loginMessage != null)
-                                {
-                                    CreateUser(loginMessage, webSocket);
-                                    Console.WriteLine("Login ok");
-                                }
-                                break;
-                            case MessageType.JOINROOM:
-                                Console.WriteLine("Type join room");
-                                break;
-                            case MessageType.KEY:
-                                Console.WriteLine("Type key");
-                                break;
-                            default:
-                                break;
+                                case "LOGIN":
+                                    LoginMessage? loginMessage = JsonSerializer.Deserialize<LoginMessage>(message);
+                                    Console.WriteLine(loginMessage);
+
+                                    if (loginMessage != null)
+                                    {
+                                        List<Room>? rooms = UserActions.CreateUser(databaseService, loginMessage);
+                                        if (rooms != null)
+                                        {
+                                            Console.WriteLine("Able to log in");
+
+                                            var json = new
+                                            {
+                                                StatusCode = 200,
+                                                Rooms = rooms,
+                                            };
+
+                                            await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(json))),
+                                                            WebSocketMessageType.Text, true, CancellationToken.None);
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Unable to log in");
+
+                                            var json = new
+                                            {
+                                                StatusCode = 401,
+                                                Rooms = "",
+                                            };
+
+                                            await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(json))),
+                                                            WebSocketMessageType.Text, true, CancellationToken.None);
+                                        }
+                                    }
+                                    break;
+
+                                case "JOINROOM":
+                                    Console.WriteLine("Type join room");
+                                    break;
+
+                                case "KEY":
+                                    Console.WriteLine("Type key");
+                                    break;
+
+                                default:
+                                    break;
+                            }
                         }
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)

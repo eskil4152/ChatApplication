@@ -10,9 +10,15 @@ namespace ChatApplicationServerHttp
             this.databaseContext = databaseContext;
 		}
 
-		public void Register(User user)
+        public bool Register(User user)
 		{
+			if (databaseContext.Users.FirstOrDefault(u => u.Username == user.Username) != null)
+			{
+				return false;
+			}
+
 			databaseContext.Users.Add(user);
+			return true;
 		}
 
 		public User? CheckUser(string username, string password)
