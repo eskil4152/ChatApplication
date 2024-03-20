@@ -12,12 +12,13 @@ namespace ChatApplicationServerHttp
 
         public bool Register(User user)
 		{
-			if (databaseContext.Users.FirstOrDefault(u => u.Username == user.Username) != null)
+			if (databaseContext.users.FirstOrDefault(u => u.Username == user.Username) != null)
 			{
 				return false;
 			}
 
-			databaseContext.Users.Add(user);
+			databaseContext.users.Add(user);
+			databaseContext.SaveChanges();
 			return true;
 		}
 
@@ -26,7 +27,7 @@ namespace ChatApplicationServerHttp
 			// find by username
 			// check found user with provided user password
 			// return if correct
-			User? user = databaseContext.Users.FirstOrDefault(u => u.Username == username);
+			User? user = databaseContext.users.FirstOrDefault(u => u.Username == username);
 
 			if (user != null && Password.CheckPassword(password, user.Password))
 			{

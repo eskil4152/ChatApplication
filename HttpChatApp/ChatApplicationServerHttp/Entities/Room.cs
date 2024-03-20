@@ -1,16 +1,22 @@
 ﻿using System.Net.WebSockets;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChatApplicationServerHttp
 {
     public class Room
     {
+        public Room()
+        {
+            Id = Guid.NewGuid();
+        }
+
+        [Key]
+        public Guid Id { get; set; }
         public string? RoomName { get; set; }
-        public int? RoomNumber { get; set; }
         public string? RoomPassword { get; set; }
-        public string? RoomSecret { get; set; }
+
         // Use websocket only for active members
-        public List<WebSocket>? MembersActive { get; set; }
+        //public List<WebSocket>? MembersActive { get; set; }
         public List<User>? Members { get; set; }
         public List<string>? Messages { get; set; }
     }

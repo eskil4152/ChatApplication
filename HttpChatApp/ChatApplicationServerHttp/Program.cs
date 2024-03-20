@@ -9,7 +9,8 @@ namespace ChatApplicationServerHttp
     {
         static async Task Main()
         {
-            DatabaseService databaseService = new(new DatabaseContext());
+            var dbContext = new DatabaseContext();
+            var databaseService = new DatabaseService(dbContext);
 
             HttpListener listener = new();
             listener.Prefixes.Add("http://192.168.0.135:8083/");

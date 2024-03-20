@@ -13,7 +13,7 @@ namespace ChatApplicationServerHttp
             try
             {
                 Room room = rooms[roomNumber];
-                room.MembersActive.Remove(client);
+                //room.MembersActive.Remove(client);
             } catch
             {
                 Console.WriteLine("");
@@ -49,9 +49,9 @@ namespace ChatApplicationServerHttp
             if (rooms.ContainsKey(roomNumber))
             {
                 Room room = rooms[roomNumber];
-                room.MembersActive ??= new List<WebSocket>();
+                //room.MembersActive ??= new List<WebSocket>();
 
-                rooms[roomNumber].MembersActive.Add(client);
+                //rooms[roomNumber].MembersActive.Add(client);
 
 
                 _ = UpdateUsersMessagesAsync(client, room);
@@ -62,14 +62,13 @@ namespace ChatApplicationServerHttp
                 {
                     RoomName = "",
                     RoomPassword = "",
-                    RoomSecret = "",
-                    MembersActive = new List<WebSocket>()
+                    /*MembersActive = new List<WebSocket>()
                     {
                         client
-                    },
+                    },*/
                     Members = new List<User>()
                     {
-                        //TODO: Adds user to room
+                        //TODO: Adds user to room when joining
                     },
                     Messages = new List<string>()
                 };
@@ -91,7 +90,7 @@ namespace ChatApplicationServerHttp
 
         private static async Task UpdateRoomAsync(int roomNumber, string user, string message)
         {
-            Room room = rooms[roomNumber];
+            /*Room room = rooms[roomNumber];
             string jsonMessage = "{\"username\":\"" + user + "\", \"message\":\"" + message + "\"}";
 
             room.Messages ??= new List<string>();
@@ -116,7 +115,7 @@ namespace ChatApplicationServerHttp
                 {
                     RemoveFromRoom(client, 1);
                 }
-            }
+            }*/
         }
     }
 }

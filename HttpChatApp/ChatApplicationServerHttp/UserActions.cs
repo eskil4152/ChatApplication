@@ -32,6 +32,15 @@ namespace ChatApplicationServerHttp
 
                 if (databaseService.Register(user))
                 {
+                    Console.WriteLine("Got it");
+                    User? user1 = databaseService.CheckUser(loginMessage.Username, loginMessage.Password);
+                    if (user1 == null)
+                    {
+                        Console.WriteLine("Was null");
+                    } else
+                    {
+                        Console.WriteLine("Was not null");
+                    }
                     return new List<Room>();
                 }
 
