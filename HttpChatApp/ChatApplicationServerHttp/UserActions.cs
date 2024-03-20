@@ -9,7 +9,7 @@ namespace ChatApplicationServerHttp
         {
             if (loginMessage.LoginType == LoginType.LOGIN)
             {
-                User? user = databaseService.CheckUser(loginMessage.Username, loginMessage.Password);
+                User? user = databaseService.Login(loginMessage.Username, loginMessage.Password);
 
                 if (user != null)
                 {
@@ -33,7 +33,7 @@ namespace ChatApplicationServerHttp
                 if (databaseService.Register(user))
                 {
                     Console.WriteLine("Got it");
-                    User? user1 = databaseService.CheckUser(loginMessage.Username, loginMessage.Password);
+                    User? user1 = databaseService.Login(loginMessage.Username, loginMessage.Password);
                     if (user1 == null)
                     {
                         Console.WriteLine("Was null");

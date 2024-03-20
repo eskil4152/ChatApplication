@@ -19,6 +19,7 @@ public class LoginMessage
 
 public class RoomMessage
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required RoomType RoomType { get; set; }
     public string? RoomName { get; set; }
     public string? RoomPassword { get; set; }

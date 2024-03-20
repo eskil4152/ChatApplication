@@ -123,10 +123,6 @@ namespace ChatApplicationServerHttp
                                     }
                                     break;
 
-                                case "KEY":
-                                    Console.WriteLine("Type key");
-                                    break;
-
                                 default:
                                     break;
                             }
