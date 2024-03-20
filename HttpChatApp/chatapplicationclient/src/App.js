@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { WebSocketProvider } from "./WebSocketContext";
 
 import LoginPage from "./pages/LoginPage";
 import TestPage from "./pages/TestPage";
