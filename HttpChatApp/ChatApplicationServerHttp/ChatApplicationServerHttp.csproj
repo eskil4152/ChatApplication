@@ -11,11 +11,15 @@
     <None Remove="Database\" />
     <None Remove="Entities\" />
     <None Remove="Migrations\" />
+    <None Remove="Tools\" />
+    <None Remove="RequestMethods\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Database\" />
     <Folder Include="Entities\" />
     <Folder Include="Migrations\" />
+    <Folder Include="Tools\" />
+    <Folder Include="RequestMethods\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />

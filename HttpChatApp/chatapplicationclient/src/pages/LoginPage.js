@@ -8,6 +8,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loginType, setLoginType] = useState(false);
 
+  const [message, setMessage] = useState("");
+
   useEffect(() => {
     if (!socket) return;
 
@@ -16,9 +18,10 @@ export default function LoginPage() {
 
       if (message.StatusCode === 200) {
         console.log("Ok");
+        setMessage("OK");
       } else {
         console.log("Not ok");
-        console.log(":(");
+        setMessage("Not ok");
       }
     }
 
@@ -61,13 +64,16 @@ export default function LoginPage() {
         <button>Confirm</button>
       </form>
 
+      <p>Currently {loginType ? "logging in" : "registering"}</p>
       <button
         onClick={() => {
           setLoginType(!loginType);
         }}
       >
-        Switch login type
+        Switch between log in / register
       </button>
+
+      <p>{message}</p>
     </div>
   );
 }

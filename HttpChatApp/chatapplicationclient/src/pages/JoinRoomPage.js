@@ -6,6 +6,7 @@ export default function JoinRoomPage() {
 
   const [roomName, setRoomName] = useState("");
   const [roomPassword, setRoomPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!socket) return;
@@ -14,8 +15,10 @@ export default function JoinRoomPage() {
       const message = JSON.parse(e.data);
 
       if (message.StatusCode === 200) {
+        setMessage("Passed");
         console.log("Ok");
       } else {
+        setMessage("Failed");
         console.log("Not ok");
       }
     }
@@ -34,10 +37,9 @@ export default function JoinRoomPage() {
       socket.send(
         JSON.stringify({
           Type: "JOINROOM",
-          RoomType: "CREATE",
+          RoomType: "JOIN",
           RoomName: roomName,
           RoomPassword: roomPassword,
-          Username: "eskil123",
         })
       );
     }
@@ -58,6 +60,8 @@ export default function JoinRoomPage() {
         />
         <button>Confirm</button>
       </form>
+
+      <p>{message}</p>
     </div>
   );
 }

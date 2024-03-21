@@ -44,11 +44,11 @@ namespace ChatApplicationServerHttp
         }
 
 
-        public static bool AddToRoom(DatabaseService databaseService, RoomMessage roomMessage)
+        public static bool AddToRoom(DatabaseService databaseService, RoomMessage roomMessage, UserData userData)
         {
             if (roomMessage.RoomType == RoomType.JOIN)
             {
-                if (databaseService.JoinRoom(roomMessage))
+                if (databaseService.JoinRoom(roomMessage, userData))
                 {
                     Console.WriteLine("Joined");
 
@@ -68,9 +68,9 @@ namespace ChatApplicationServerHttp
                     {
                         client
                     },*/
-                    Members = new List<string>()
+                    Members = new List<User>()
                     {
-                        roomMessage.Username
+                        userData.user
                     },
                     Messages = new List<string>()
                 };

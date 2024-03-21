@@ -23,7 +23,6 @@ public class RoomMessage
     public required RoomType RoomType { get; set; }
     public string? RoomName { get; set; }
     public string? RoomPassword { get; set; }
-    public required string Username { get; set; }
 }
 
 public enum LoginType

@@ -5,7 +5,7 @@ namespace ChatApplicationServerHttp
 {
 	public class UserActions
 	{
-        public static List<Room>? LoginRegister(DatabaseService databaseService, LoginMessage loginMessage)
+        public static User? LoginRegister(DatabaseService databaseService, LoginMessage loginMessage)
         {
             if (loginMessage.LoginType == LoginType.LOGIN)
             {
@@ -13,7 +13,7 @@ namespace ChatApplicationServerHttp
 
                 if (user != null)
                 {
-                    return user.Rooms;
+                    return user;
                 }
                 else
                 {
@@ -33,15 +33,15 @@ namespace ChatApplicationServerHttp
                 if (databaseService.Register(user))
                 {
                     Console.WriteLine("Got it");
-                    User? user1 = databaseService.Login(loginMessage.Username, loginMessage.Password);
-                    if (user1 == null)
+                    User? registeredUser = databaseService.Login(loginMessage.Username, loginMessage.Password);
+                    if (registeredUser == null)
                     {
                         Console.WriteLine("Was null");
                     } else
                     {
                         Console.WriteLine("Was not null");
                     }
-                    return new List<Room>();
+                    return registeredUser;
                 }
 
                 Console.WriteLine("Registration failed");

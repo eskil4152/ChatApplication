@@ -22,13 +22,13 @@ namespace ChatApplicationServerHttp
 			return true;
 		}
 
-		public bool JoinRoom(RoomMessage roomMessage)
+		public bool JoinRoom(RoomMessage roomMessage, UserData userData)
 		{
 			Room? room = databaseContext.rooms.FirstOrDefault(u => u.RoomName == roomMessage.RoomName);
 
-			if (room != null && room.RoomPassword == roomMessage.RoomPassword)
+			if (room != null && room.RoomPassword == roomMessage.RoomPassword && userData.user != null)
 			{
-				room.Members.Add(roomMessage.Username);
+				room.Members.Add(userData.user);
 				databaseContext.SaveChanges();
 
 				return true;

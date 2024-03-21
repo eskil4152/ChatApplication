@@ -8,9 +8,32 @@ namespace ChatApplicationServerHttp
 {
     class Program
     {
-        private static ConcurrentDictionary<string, UserData> sessionData = new();
-
         static async Task Main()
+        {
+            var dbContext = new DatabaseContext();
+            var databaseService = new DatabaseService(dbContext);
+
+            HttpListener listener = new();
+            listener.Prefixes.Add("http://192.168.0.135:8083/");
+            listener.Start();
+            Console.WriteLine("Listening for HTTP connections...");
+
+            while (true)
+            {
+                HttpListenerContext context = await listener.GetContextAsync();
+
+                if (context.Request.IsWebSocketRequest)
+                {
+                    Console.WriteLine("Not implemented");
+                    await WebSocketRequest.ProcessWebSocketRequest(context, databaseService);
+                } else
+                {
+                    await HttpRequests.ProcessRestRequest(context, databaseService);
+                }
+            }
+        }
+        
+        /*static async Task Main()
         {
             var dbContext = new DatabaseContext();
             var databaseService = new DatabaseService(dbContext);
@@ -35,21 +58,33 @@ namespace ChatApplicationServerHttp
             }
         }
 
+        private static ConcurrentDictionary<string, UserData> sessionData = new();
+
         static async Task ProcessWebSocketRequest(DatabaseService databaseService, HttpListenerContext context)
         {
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
 
-            string? sessionId = context?.Request?.Cookies["sessionId"]?.Value;
-            if (string.IsNullOrEmpty(sessionId) || !sessionData.TryGetValue(sessionId, out UserData userData))
+            string sessionId = context?.Request?.Cookies["sessionId"]?.Value ?? Guid.NewGuid().ToString();
+            UserData userData;
+
+            if (sessionData.TryGetValue(sessionId, out userData))
             {
-                userData = new() { WebSocket = webSocket };
-                sessionId = Guid.NewGuid().ToString();
-                sessionData[sessionId] = userData;
-                context.Response.SetCookie(new Cookie("sessionId", sessionId));
+                Console.WriteLine($"User {userData.user.Username} reconnected.");
+                userData.WebSocket = webSocket; // Update WebSocket reference
+            }
+            else
+            {
+                Console.WriteLine("New user connected.");
+                userData = new UserData { WebSocket = webSocket };
+                sessionData.TryAdd(sessionId, userData);
             }
 
-            Console.WriteLine(userData?.user?.Username != null ? "NOT NULL" : "NULL");
+            Cookie cookie = new("sessionId", sessionId);
+            Console.WriteLine("Cookie: " + cookie);
+
+            context.Response.SetCookie(new Cookie("sessionId", sessionId));
+            context.Response.Headers.Add("Set-Cookie", $"sessionId={sessionId}; Path=/; HttpOnly; SameSite=Strict");
 
             string ip = context.Request.RemoteEndPoint.Address.ToString();
             Console.WriteLine("Connected {0}", ip);
@@ -168,6 +203,18 @@ namespace ChatApplicationServerHttp
 
             RoomActions.RemoveFromRoom(webSocket, 1);
             webSocket?.Dispose();
+            CleanupDisconnectedSessions();
         }
+
+        static void CleanupDisconnectedSessions()
+        {
+            foreach (var kvp in sessionData)
+            {
+                if (kvp.Value.WebSocket.State != WebSocketState.Open)
+                {
+                    sessionData.TryRemove(kvp.Key, out _);
+                }
+            }
+        }*/
     }
 }
