@@ -15,7 +15,7 @@ namespace ChatApplicationServerHttp
             User user = new()
             {
                 Username = loginMessage.Username,
-                Password = Password.HashPassword(loginMessage.Password),
+                Password = Security.HashPassword(loginMessage.Password),
                 Rooms = new List<Room>(),
             };
 

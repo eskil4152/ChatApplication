@@ -10,6 +10,11 @@ namespace ChatApplicationServerHttp
             this.databaseContext = databaseContext;
 		}
 
+		public List<Room> GetRooms(string username)
+		{
+			return databaseContext.users.FirstOrDefault(u => u.Username == username).Rooms;
+		}
+
 		public bool CreateRoom(Room room)
 		{
             if (databaseContext.rooms.FirstOrDefault(u => u.RoomName == room.RoomName) != null)
@@ -22,13 +27,13 @@ namespace ChatApplicationServerHttp
 			return true;
 		}
 
-		public bool JoinRoom(RoomMessage roomMessage, UserData userData)
+		public bool JoinRoom(RoomMessage roomMessage, User user)
 		{
 			Room? room = databaseContext.rooms.FirstOrDefault(u => u.RoomName == roomMessage.RoomName);
 
-			if (room != null && room.RoomPassword == roomMessage.RoomPassword && userData.user != null)
+			if (room != null && room.RoomPassword == roomMessage.RoomPassword)
 			{
-				room.Members.Add(userData.user);
+				room.Members.Add(user);
 				databaseContext.SaveChanges();
 
 				return true;
@@ -51,18 +56,20 @@ namespace ChatApplicationServerHttp
 
 		public User? Login(string username, string password)
 		{
-			// find by username
-			// check found user with provided user password
-			// return if correct
 			User? user = databaseContext.users.FirstOrDefault(u => u.Username == username);
 
-			if (user != null && Password.CheckPassword(password, user.Password))
+			if (user != null && Security.CheckPassword(password, user.Password))
 			{
 				return user;
 			}
 
 			return null;
         }
+
+		public User? GetUser(string username)
+		{
+			return databaseContext.users.FirstOrDefault(u => u.Username == username);
+		}
 
 		public void GetMessages()
 		{
@@ -73,11 +80,6 @@ namespace ChatApplicationServerHttp
 		{
 			// save new messages to room
 			// perhaps save messages in server and only save once an hour
-		}
-
-		public void UserAndRoomConnect()
-		{
-			// when user add room, add room to user list and user to room list
 		}
 	}
 }

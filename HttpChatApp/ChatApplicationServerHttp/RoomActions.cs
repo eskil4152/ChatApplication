@@ -8,18 +8,6 @@ namespace ChatApplicationServerHttp
     {
         private static readonly Dictionary<int, Room> rooms = new();
 
-        public static void RemoveFromRoom(WebSocket client, int roomNumber)
-        {
-            try
-            {
-                Room room = rooms[roomNumber];
-                //room.MembersActive.Remove(client);
-            } catch
-            {
-                Console.WriteLine("");
-            }
-        }
-
         public static async Task UpdateUsersMessagesAsync(WebSocket client, Room room)
         {
             try
@@ -44,42 +32,31 @@ namespace ChatApplicationServerHttp
         }
 
 
-        public static bool AddToRoom(DatabaseService databaseService, RoomMessage roomMessage, UserData userData)
+        public static bool JoinRoom(DatabaseService databaseService, RoomMessage roomMessage, User user)
         {
-            if (roomMessage.RoomType == RoomType.JOIN)
-            {
-                if (databaseService.JoinRoom(roomMessage, userData))
-                {
-                    Console.WriteLine("Joined");
+            return databaseService.JoinRoom(roomMessage, user);
+        }
 
-                    return true;
-                } else
-                {
-                    Console.WriteLine("Unable to join");
-                }
-            }
-            else if (roomMessage.RoomType == RoomType.CREATE)
+        public static bool CreateRoom(DatabaseService databaseService, RoomMessage roomMessage, User user)
+        {
+            /*
+
+            Room newRoom = new()
             {
-                Room newRoom = new()
-                {
-                    RoomName = roomMessage.RoomName,
-                    RoomPassword = roomMessage.RoomPassword,
-                    /*MembersActive = new List<WebSocket>()
-                    {
-                        client
-                    },*/
-                    Members = new List<User>()
+                RoomName = roomMessage.RoomName,
+                RoomPassword = roomMessage.RoomPassword,
+                
+                Members = new List<User>()
                     {
                         userData.user
                     },
-                    Messages = new List<string>()
-                };
+                Messages = new List<string>()
+            };
 
-                if (databaseService.CreateRoom(newRoom))
-                {
-                    return true;
-                }
-            }
+            if (databaseService.CreateRoom(newRoom))
+            {
+                return true;
+            }*/
 
             return false;
         }

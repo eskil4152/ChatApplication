@@ -17,28 +17,6 @@ public class LoginMessage
 
 public class RoomMessage
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required RoomType RoomType { get; set; }
     public string? RoomName { get; set; }
     public string? RoomPassword { get; set; }
-}
-
-public enum RoomType
-{
-    [EnumMember(Value = "JOIN")]
-    JOIN,
-    [EnumMember(Value = "CREATE")]
-    CREATE
-}
-
-public enum MessageType
-{
-    [EnumMember(Value = "LOGIN")]
-    LOGIN,
-    [EnumMember(Value = "JOINROOM")]
-    JOINROOM,
-    [EnumMember(Value = "KEY")]
-    KEY,
-    [EnumMember(Value = "CHAT")]
-    CHAT
 }

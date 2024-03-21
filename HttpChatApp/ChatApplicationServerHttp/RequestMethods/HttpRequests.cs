@@ -42,9 +42,13 @@ namespace ChatApplicationServerHttp
             switch (path)
             {
                 case "/api/rooms":
-                    await WriteResponse.WriteJsonResponse(context, new List<string>(), 200, null);
+                    Cookie? cookie = context.Request.Cookies["Username"];
+                    
+                    await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(cookie.Value), 200, null);
                     break;
 
+                case "/api/room/enter/*":
+                    break;
                 default:
                     if (path.StartsWith("/api/room/"))
                     {
@@ -64,7 +68,8 @@ namespace ChatApplicationServerHttp
         private static async Task HandlePostRequest(DatabaseService databaseService, HttpListenerContext context, string path)
         {
             string requestBody;
-            LoginMessage? requestData;
+            LoginMessage? loginData;
+            RoomMessage? roomData;
 
             switch (path)
             {
@@ -76,21 +81,19 @@ namespace ChatApplicationServerHttp
 
                     try
                     {
-                        requestData = JsonSerializer.Deserialize<LoginMessage>(requestBody);
-                        if (requestData == null)
+                        loginData = JsonSerializer.Deserialize<LoginMessage>(requestBody);
+                        if (loginData == null)
                         {
                             context.Response.StatusCode = 400;
                             context.Response.Close();
                             break;
                         }
 
-                        User? user = UserActions.Login(databaseService, requestData);
+                        User? user = UserActions.Login(databaseService, loginData);
 
                         if (user != null)
                         {
-                            Cookie cookie = new("Username", user.Username);
-
-                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, cookie);
+                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, Cookies.CreateCookie("Username", user.Username));
                         }
                         else
                         {
@@ -114,19 +117,19 @@ namespace ChatApplicationServerHttp
 
                     try
                     {
-                        requestData = JsonSerializer.Deserialize<LoginMessage>(requestBody);
-                        if (requestData == null)
+                        loginData = JsonSerializer.Deserialize<LoginMessage>(requestBody);
+                        if (loginData == null)
                         {
                             context.Response.StatusCode = 400;
                             context.Response.Close();
                             break;
                         }
 
-                        User? user = UserActions.Register(databaseService, requestData);
+                        User? user = UserActions.Register(databaseService, loginData);
 
                         if (user != null)
                         {
-                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, new Cookie("Username", user.Username));
+                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, Cookies.CreateCookie("Username", user.Username));
                         }
                         else
                         {
@@ -142,6 +145,54 @@ namespace ChatApplicationServerHttp
                         context.Response.Close();
                         break;
                     }
+
+                    break;
+
+                case "/api/room/join":
+                    using (var reader = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
+                    {
+                        requestBody = await reader.ReadToEndAsync();
+                    }
+
+                    try
+                    {
+                        roomData = JsonSerializer.Deserialize<RoomMessage>(requestBody);
+                        Cookie? cookie = context.Request.Cookies["Username"];
+
+                        if (roomData == null || cookie == null)
+                        {
+                            context.Response.StatusCode = 400;
+                            context.Response.Close();
+                            break;
+                        }
+
+                        User? user = databaseService.GetUser(Cookies.DecryptCookie(cookie));
+
+                        if (user == null)
+                        {
+                            context.Response.StatusCode = 401;
+                            context.Response.Close();
+                            break;
+                        }
+
+                        if (databaseService.JoinRoom(roomData, user))
+                        {
+                            await WriteResponse.WriteJsonResponse(context, "", 200, null);
+                        } else
+                        {
+                            context.Response.StatusCode = 401;
+                            context.Response.Close();
+                        }
+                    }
+                    catch
+                    {
+                        context.Response.StatusCode = 400;
+                        context.Response.Close();
+                        break;
+                    }
+                    break;
+
+                case "api/room/create":
 
                     break;
                 default:

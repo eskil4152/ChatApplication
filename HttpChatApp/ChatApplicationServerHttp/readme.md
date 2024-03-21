@@ -1,4 +1,9 @@
-﻿need to:
+﻿#todo#
+
+clean, too messy
+cookie proper
+
+need to:
 
 user must choose a room
 gets all rooms
