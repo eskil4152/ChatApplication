@@ -7,7 +7,7 @@ namespace ChatApplicationServerHttp
 {
 	public class WriteResponse
 	{
-        public static async Task WriteJsonResponse(HttpListenerContext context, object responseObject)
+        public static async Task WriteJsonResponse(HttpListenerContext context, object responseObject, int statusCode, Cookie? cookie)
         {
             string jsonResponse = JsonSerializer.Serialize(responseObject);
             byte[] responseBytes = Encoding.UTF8.GetBytes(jsonResponse);
@@ -16,10 +16,12 @@ namespace ChatApplicationServerHttp
             context.Response.ContentEncoding = Encoding.UTF8;
             context.Response.ContentLength64 = responseBytes.Length;
 
-            Cookie cookie = new("coo", "cook");
-            context.Response.Cookies.Add(cookie);
+            if (cookie != null)
+                context.Response.Cookies.Add(cookie);
 
-            await context.Response.OutputStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+            context.Response.StatusCode = statusCode;
+
+            await context.Response.OutputStream.WriteAsync(responseBytes);
             context.Response.Close();
         }
     }

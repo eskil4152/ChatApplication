@@ -42,14 +42,14 @@ namespace ChatApplicationServerHttp
             switch (path)
             {
                 case "/api/rooms":
-                    await WriteResponse.WriteJsonResponse(context, "got rooms");
+                    await WriteResponse.WriteJsonResponse(context, new List<string>(), 200, null);
                     break;
 
                 default:
                     if (path.StartsWith("/api/room/"))
                     {
                         string roomId = path["/api/room/".Length..];
-                        await WriteResponse.WriteJsonResponse(context, "got room " + roomId);
+                        await WriteResponse.WriteJsonResponse(context, "got room " + roomId, 200, null);
                         Console.WriteLine("Room id: {0}", roomId);
                     }
                     else
@@ -84,24 +84,19 @@ namespace ChatApplicationServerHttp
                             break;
                         }
 
-                        User? user = UserActions.LoginRegister(databaseService, requestData);
+                        User? user = UserActions.Login(databaseService, requestData);
 
                         if (user != null)
                         {
-                            var json = new
-                            {
-                                StatusCode = 200,
-                                User = user, // Assuming you want to return the user details
-                            };
+                            Cookie cookie = new("Username", user.Username);
 
-                            await WriteResponse.WriteJsonResponse(context, json);
+                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, cookie);
                         }
                         else
                         {
                             context.Response.StatusCode = 401;
                             context.Response.Close();
                         }
-
                     } catch
                     {
                         context.Response.StatusCode = 400;
@@ -127,27 +122,22 @@ namespace ChatApplicationServerHttp
                             break;
                         }
 
-                        User? user = UserActions.LoginRegister(databaseService, requestData);
+                        User? user = UserActions.Register(databaseService, requestData);
 
                         if (user != null)
                         {
-                            var json = new
-                            {
-                                StatusCode = 200,
-                                User = user, // Assuming you want to return the user details
-                            };
-
-                            await WriteResponse.WriteJsonResponse(context, json);
+                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, new Cookie("Username", user.Username));
                         }
                         else
                         {
-                            context.Response.StatusCode = 401;
+                            context.Response.StatusCode = 409;
                             context.Response.Close();
                         }
 
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        Console.WriteLine("Error: " + e.Message);
                         context.Response.StatusCode = 400;
                         context.Response.Close();
                         break;

@@ -11,8 +11,6 @@ public class ChatMessage
 
 public class LoginMessage
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required LoginType LoginType { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
 }
@@ -23,14 +21,6 @@ public class RoomMessage
     public required RoomType RoomType { get; set; }
     public string? RoomName { get; set; }
     public string? RoomPassword { get; set; }
-}
-
-public enum LoginType
-{
-    [EnumMember(Value = "LOGIN")]
-    LOGIN,
-    [EnumMember(Value = "REGISTER")]
-    REGISTER
 }
 
 public enum RoomType
