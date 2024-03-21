@@ -2,11 +2,14 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Concurrent;
 
 namespace ChatApplicationServerHttp
 {
     class Program
     {
+        private static ConcurrentDictionary<string, UserData> sessionData = new();
+
         static async Task Main()
         {
             var dbContext = new DatabaseContext();
@@ -37,12 +40,23 @@ namespace ChatApplicationServerHttp
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
 
+            string? sessionId = context?.Request?.Cookies["sessionId"]?.Value;
+            if (string.IsNullOrEmpty(sessionId) || !sessionData.TryGetValue(sessionId, out UserData userData))
+            {
+                userData = new() { WebSocket = webSocket };
+                sessionId = Guid.NewGuid().ToString();
+                sessionData[sessionId] = userData;
+                context.Response.SetCookie(new Cookie("sessionId", sessionId));
+            }
+
+            Console.WriteLine(userData?.user?.Username != null ? "NOT NULL" : "NULL");
+
             string ip = context.Request.RemoteEndPoint.Address.ToString();
             Console.WriteLine("Connected {0}", ip);
 
-            try
+            while (webSocket.State == WebSocketState.Open)
             {
-                while (webSocket.State == WebSocketState.Open)
+                try
                 {
                     ArraySegment<byte> buffer = new(new byte[1024]);
                     WebSocketReceiveResult result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
@@ -57,29 +71,34 @@ namespace ChatApplicationServerHttp
                             switch (jsonElement.ToString())
                             {
                                 case "CHAT":
-                                    Console.WriteLine("Chat received");
                                     ChatMessage? chatMessage = JsonSerializer.Deserialize<ChatMessage>(message);
 
                                     if (chatMessage != null)
                                     {
                                         RoomActions.PostToRoom(1, chatMessage);
-                                        Console.WriteLine("Post chat ok");
                                     }
                                     break;
 
                                 case "LOGIN":
+                                    if (userData.user != null)
+                                    {
+                                        Console.WriteLine("Already logged in");
+                                        break;
+                                    }
+
                                     LoginMessage? loginMessage = JsonSerializer.Deserialize<LoginMessage>(message);
                                     Console.WriteLine(loginMessage);
 
                                     if (loginMessage != null)
                                     {
-                                        List<Room>? rooms = UserActions.LoginRegister(databaseService, loginMessage);
-                                        if (rooms != null)
+                                        User? user = UserActions.LoginRegister(databaseService, loginMessage);
+                                        if (user != null)
                                         {
+                                            userData.user = user;
                                             var json = new
                                             {
                                                 StatusCode = 200,
-                                                Rooms = rooms,
+                                                Rooms = user.Rooms,
                                             };
 
                                             await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(json))),
@@ -100,14 +119,20 @@ namespace ChatApplicationServerHttp
                                     break;
 
                                 case "JOINROOM":
+                                    if (userData.user != null)
+                                    {
+                                        Console.WriteLine("Not logged in");
+                                        break;
+                                    }
+
                                     RoomMessage? roomMessage = JsonSerializer.Deserialize<RoomMessage>(message);
                                     if (roomMessage != null)
                                     {
                                         var json = new
                                         {
-                                            StatusCode = RoomActions.AddToRoom(databaseService, roomMessage) ? 200 : 401,
+                                            StatusCode = RoomActions.AddToRoom(databaseService, roomMessage, userData) ? 200 : 401,
                                         };
-                                        
+
                                         await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(json))),
                                                         WebSocketMessageType.Text, true, CancellationToken.None);
                                     }
@@ -135,16 +160,14 @@ namespace ChatApplicationServerHttp
                         break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred: " + ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("An error occurred: " + ex.Message);
-                RoomActions.RemoveFromRoom(webSocket, 1);
-            }
-            finally
-            {
-                webSocket?.Dispose();
-            }
+
+            RoomActions.RemoveFromRoom(webSocket, 1);
+            webSocket?.Dispose();
         }
     }
 }
