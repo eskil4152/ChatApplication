@@ -9,6 +9,7 @@ namespace ChatApplicationServerHttp
         public User()
         {
             Id = Guid.NewGuid();
+            Rooms = new List<RoomUser>();
         }
 
         [Key]
@@ -16,7 +17,7 @@ namespace ChatApplicationServerHttp
         public required string Username { get; set; }
         public required string Password { get; set; }
 
-        public required List<Room> Rooms { get; set; }
+        public required List<RoomUser> Rooms { get; set; }
     }
 }
 

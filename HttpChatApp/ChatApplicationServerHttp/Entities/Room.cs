@@ -8,6 +8,7 @@ namespace ChatApplicationServerHttp
         public Room()
         {
             Id = Guid.NewGuid();
+            Members = new List<Guid>();
         }
 
         [Key]
@@ -16,6 +17,6 @@ namespace ChatApplicationServerHttp
         public string? RoomPassword { get; set; }
         public required List<string> Messages { get; set; }
 
-        public required List<User> Members { get; set; }
+        public required List<Guid> Members { get; set; }
     }
 }
