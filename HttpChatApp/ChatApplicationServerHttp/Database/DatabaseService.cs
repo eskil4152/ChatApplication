@@ -48,7 +48,7 @@ namespace ChatApplicationServerHttp
 
             databaseContext.rooms.Add(room);
 
-            RoomUser roomUser = new RoomUser()
+            RoomUser roomUser = new()
             {
                 UserId = user.Id,
                 RoomId = room.Id

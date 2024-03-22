@@ -12,8 +12,16 @@ namespace ChatApplicationServerHttp
 		{
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
-            
-            Console.WriteLine("Connected {0}", context.Request.RemoteEndPoint.Address.ToString());
+
+            Cookie? cookie = context.Request.Cookies["Username"];
+
+            if (cookie == null) return;
+
+            string Username = Cookies.DecryptCookie(cookie);
+
+            Console.WriteLine("Got " + Username);
+
+            //Console.WriteLine("Connected {0}", context.Request.RemoteEndPoint.Address.ToString());
 
             while (webSocket.State == WebSocketState.Open)
             {
@@ -42,7 +50,6 @@ namespace ChatApplicationServerHttp
                     Console.WriteLine("An error occurred: " + ex.Message);
                 }
             }
-
         }
 	}
 }

@@ -16,7 +16,6 @@ namespace ChatApplicationServerHttp
             {
                 Username = loginMessage.Username,
                 Password = Security.HashPassword(loginMessage.Password),
-                Rooms = new List<RoomUser>(),
             };
 
             return databaseService.Register(user) ? user : null;

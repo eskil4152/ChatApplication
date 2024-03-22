@@ -9,15 +9,12 @@ namespace ChatApplicationServerHttp
         public User()
         {
             Id = Guid.NewGuid();
-            Rooms = new List<RoomUser>();
         }
 
         [Key]
         public Guid Id { get; set; }
         public required string Username { get; set; }
         public required string Password { get; set; }
-
-        public required List<RoomUser> Rooms { get; set; }
     }
 }
 

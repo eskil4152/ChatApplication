@@ -84,7 +84,7 @@ namespace ChatApplicationServerHttp
 
                         if (user != null)
                         {
-                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, Cookies.CreateCookie("Username", user.Username));
+                            await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(user.Username), 200, Cookies.CreateCookie("Username", user.Username));
                         }
                         else
                         {
@@ -118,7 +118,7 @@ namespace ChatApplicationServerHttp
 
                         if (user != null)
                         {
-                            await WriteResponse.WriteJsonResponse(context, user.Rooms, 200, Cookies.CreateCookie("Username", user.Username));
+                            await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(user.Username), 200, Cookies.CreateCookie("Username", user.Username));
                         }
                         else
                         {

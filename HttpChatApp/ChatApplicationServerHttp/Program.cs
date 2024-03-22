@@ -24,7 +24,6 @@ namespace ChatApplicationServerHttp
 
                 if (context.Request.IsWebSocketRequest)
                 {
-                    Console.WriteLine("Not implemented");
                     await WebSocketRequest.ProcessWebSocketRequest(context, databaseService);
                 } else
                 {
