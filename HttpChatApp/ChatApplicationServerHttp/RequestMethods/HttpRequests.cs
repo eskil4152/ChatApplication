@@ -44,11 +44,14 @@ namespace ChatApplicationServerHttp
                 case "/api/rooms":
                     Cookie? cookie = context.Request.Cookies["Username"];
                     
-                    await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(cookie.Value), 200, null);
+                    if (cookie != null)
+                    {
+                        await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(cookie.Value), 200, null);
+                    }
+
+                    await WriteResponse.WriteEmptyResponse(context, 401);
                     break;
 
-                case "/api/room/enter/*":
-                    break;
                 default:
                     if (path.StartsWith("/api/room/"))
                     {
@@ -58,8 +61,7 @@ namespace ChatApplicationServerHttp
                     }
                     else
                     {
-                        context.Response.StatusCode = 404;
-                        context.Response.Close();
+                        await WriteResponse.WriteEmptyResponse(context, 404);
                     }
                     break;
             }
@@ -84,8 +86,7 @@ namespace ChatApplicationServerHttp
                         loginData = JsonSerializer.Deserialize<LoginMessage>(requestBody);
                         if (loginData == null)
                         {
-                            context.Response.StatusCode = 400;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 400);
                             break;
                         }
 
@@ -97,13 +98,11 @@ namespace ChatApplicationServerHttp
                         }
                         else
                         {
-                            context.Response.StatusCode = 401;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 401);
                         }
                     } catch
                     {
-                        context.Response.StatusCode = 400;
-                        context.Response.Close();
+                        await WriteResponse.WriteEmptyResponse(context, 400);
                         break;
                     }
 
@@ -120,8 +119,7 @@ namespace ChatApplicationServerHttp
                         loginData = JsonSerializer.Deserialize<LoginMessage>(requestBody);
                         if (loginData == null)
                         {
-                            context.Response.StatusCode = 400;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 400);
                             break;
                         }
 
@@ -133,16 +131,14 @@ namespace ChatApplicationServerHttp
                         }
                         else
                         {
-                            context.Response.StatusCode = 409;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 409);
                         }
 
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Error: " + e.Message);
-                        context.Response.StatusCode = 400;
-                        context.Response.Close();
+                        await WriteResponse.WriteEmptyResponse(context, 400);
                         break;
                     }
 
@@ -161,8 +157,7 @@ namespace ChatApplicationServerHttp
 
                         if (roomData == null || cookie == null)
                         {
-                            context.Response.StatusCode = 400;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 400);
                             break;
                         }
 
@@ -170,8 +165,7 @@ namespace ChatApplicationServerHttp
 
                         if (user == null)
                         {
-                            context.Response.StatusCode = 401;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 401);
                             break;
                         }
 
@@ -180,24 +174,22 @@ namespace ChatApplicationServerHttp
                             await WriteResponse.WriteJsonResponse(context, "", 200, null);
                         } else
                         {
-                            context.Response.StatusCode = 401;
-                            context.Response.Close();
+                            await WriteResponse.WriteEmptyResponse(context, 401);
                         }
                     }
                     catch
                     {
-                        context.Response.StatusCode = 400;
-                        context.Response.Close();
+                        await WriteResponse.WriteEmptyResponse(context, 400);
                         break;
                     }
                     break;
 
                 case "api/room/create":
-
+                    break;
+                case "/api/room/enter":
                     break;
                 default:
-                    context.Response.StatusCode = 404;
-                    context.Response.Close();
+                    await WriteResponse.WriteEmptyResponse(context, 404);
                     break;
             }
         }

@@ -24,6 +24,14 @@ namespace ChatApplicationServerHttp
             await context.Response.OutputStream.WriteAsync(responseBytes);
             context.Response.Close();
         }
+
+        public static Task WriteEmptyResponse(HttpListenerContext context, int statusCode)
+        {
+            context.Response.StatusCode = statusCode;
+            context.Response.ContentLength64 = 0;
+            context.Response.Close();
+            return Task.CompletedTask;
+        }
     }
 }
 
