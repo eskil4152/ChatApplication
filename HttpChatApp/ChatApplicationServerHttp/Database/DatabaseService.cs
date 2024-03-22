@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 namespace ChatApplicationServerHttp
 {
 	public class DatabaseService
@@ -12,18 +13,53 @@ namespace ChatApplicationServerHttp
 
 		public List<Room> GetRooms(string username)
 		{
-			return databaseContext.users.FirstOrDefault(u => u.Username == username).Rooms;
+			User? user = databaseContext.users.FirstOrDefault(u => u.Username == username);
+
+			if (user == null) return new List<Room>();
+
+            List<RoomUser> roomUser = databaseContext.roomuser.Where(u => u.UserId == user.Id).ToList();
+
+			List<Room> rooms = new();
+			foreach (RoomUser ru in roomUser)
+			{
+				rooms.Add(databaseContext.rooms.FirstOrDefault(r => r.Id == ru.RoomId));
+			}
+
+            return rooms;
 		}
 
-		public bool CreateRoom(Room room)
+		public bool CreateRoom(RoomMessage roomMessage, User user)
 		{
-            if (databaseContext.rooms.FirstOrDefault(u => u.RoomName == room.RoomName) != null)
+            
+            if (databaseContext.rooms.FirstOrDefault(u => u.RoomName == roomMessage.RoomName) != null)
 			{
 				return false;
 			}
 
-			databaseContext.rooms.Add(room);
-			databaseContext.SaveChanges();
+            
+            Room room = new()
+			{
+				RoomName = roomMessage.RoomName,
+				RoomPassword = roomMessage.RoomPassword,
+				Members = new List<User>() { user },
+				Messages = new List<string>() { "Welcome to your new room!" },
+			};
+
+            
+            databaseContext.rooms.Add(room);
+
+
+			RoomUser roomUser = new()
+			{
+				RoomId = room.Id,
+				UserId = user.Id,
+			};
+
+            
+            databaseContext.roomuser.Add(roomUser);
+
+            databaseContext.SaveChanges();
+			
 			return true;
 		}
 
@@ -34,6 +70,8 @@ namespace ChatApplicationServerHttp
 			if (room != null && room.RoomPassword == roomMessage.RoomPassword)
 			{
 				room.Members.Add(user);
+				user.Rooms.Add(room);
+
 				databaseContext.SaveChanges();
 
 				return true;

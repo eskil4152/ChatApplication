@@ -46,10 +46,12 @@ namespace ChatApplicationServerHttp
                     
                     if (cookie != null)
                     {
-                        await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(cookie.Value), 200, null);
+                        await WriteResponse.WriteJsonResponse(context, databaseService.GetRooms(Cookies.DecryptCookie(cookie)), 200, null);
+                    } else
+                    {
+                        await WriteResponse.WriteEmptyResponse(context, 401);
                     }
 
-                    await WriteResponse.WriteEmptyResponse(context, 401);
                     break;
 
                 default:
@@ -100,9 +102,10 @@ namespace ChatApplicationServerHttp
                         {
                             await WriteResponse.WriteEmptyResponse(context, 401);
                         }
-                    } catch
+                    } catch (Exception e)
                     {
-                        await WriteResponse.WriteEmptyResponse(context, 400);
+                        Console.WriteLine("caught " + e.Message);
+                        await WriteResponse.WriteEmptyResponse(context, 500);
                         break;
                     }
 
@@ -184,7 +187,44 @@ namespace ChatApplicationServerHttp
                     }
                     break;
 
-                case "api/room/create":
+                case "/api/room/create":
+                    using (var reader = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
+                    {
+                        requestBody = await reader.ReadToEndAsync();
+                    }
+
+                    try
+                    {
+                        roomData = JsonSerializer.Deserialize<RoomMessage>(requestBody);
+                        Cookie? cookie = context.Request.Cookies["Username"];
+
+                        if (roomData == null || cookie == null)
+                        {
+                            await WriteResponse.WriteEmptyResponse(context, 400);
+                            break;
+                        }
+
+                        User? user = databaseService.GetUser(Cookies.DecryptCookie(cookie));
+
+                        if (user == null)
+                        {
+                            await WriteResponse.WriteEmptyResponse(context, 401);
+                            break;
+                        }
+
+                        if (databaseService.CreateRoom(roomData, user))
+                        {
+                            await WriteResponse.WriteJsonResponse(context, "", 200, null);
+                        } else
+                        {
+                            await WriteResponse.WriteEmptyResponse(context, 409);
+                        }
+                    } catch (Exception e)
+                    {
+                        Console.WriteLine("Error: " + e.Message);
+                        await WriteResponse.WriteEmptyResponse(context, 400);
+                    }
+
                     break;
                 case "/api/room/enter":
                     break;

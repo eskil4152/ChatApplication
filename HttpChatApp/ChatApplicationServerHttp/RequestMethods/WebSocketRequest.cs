@@ -33,7 +33,7 @@ namespace ChatApplicationServerHttp
                     else if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-                        RoomActions.RemoveFromRoom(webSocket, 1);
+                        //RoomActions.RemoveFromRoom(webSocket, 1);
                         break;
                     }
                 }

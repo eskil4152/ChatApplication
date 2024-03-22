@@ -8,6 +8,7 @@ namespace ChatApplicationServerHttp
     {
         public DbSet<User> users { get; set; }
         public DbSet<Room> rooms { get; set; }
+        public DbSet<RoomUser> roomuser { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

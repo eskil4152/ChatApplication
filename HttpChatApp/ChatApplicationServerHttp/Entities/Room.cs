@@ -8,8 +8,6 @@ namespace ChatApplicationServerHttp
         public Room()
         {
             Id = Guid.NewGuid();
-            Members = new List<User>();
-            Messages = new List<string>();
         }
 
         [Key]
