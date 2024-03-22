@@ -8,7 +8,6 @@ namespace ChatApplicationServerHttp
 	{
         public static async Task ProcessRestRequest(HttpListenerContext context, DatabaseService databaseService)
         {
-            Console.WriteLine("was rest");
             try
             {
                 string method = context.Request.HttpMethod;
@@ -17,11 +16,9 @@ namespace ChatApplicationServerHttp
                 switch (method)
                 {
                     case "GET":
-                        Console.WriteLine("was get");
                         await HandleGetRequest(databaseService, context, path);
                         break;
                     case "POST":
-                        Console.WriteLine("was post");
                         await HandlePostRequest(databaseService, context, path);
                         break;
                     default:
@@ -55,16 +52,7 @@ namespace ChatApplicationServerHttp
                     break;
 
                 default:
-                    if (path.StartsWith("/api/room/"))
-                    {
-                        string roomId = path["/api/room/".Length..];
-                        await WriteResponse.WriteJsonResponse(context, "got room " + roomId, 200, null);
-                        Console.WriteLine("Room id: {0}", roomId);
-                    }
-                    else
-                    {
-                        await WriteResponse.WriteEmptyResponse(context, 404);
-                    }
+                    await WriteResponse.WriteEmptyResponse(context, 404);
                     break;
             }
         }

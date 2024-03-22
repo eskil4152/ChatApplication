@@ -14,10 +14,8 @@ namespace ChatApplicationServerHttp
         public Guid Id { get; set; }
         public string? RoomName { get; set; }
         public string? RoomPassword { get; set; }
-
-        // Use websocket only for active members
-        //public List<WebSocket>? MembersActive { get; set; }
-        public required List<User> Members { get; set; }
         public required List<string> Messages { get; set; }
+
+        public required List<User> Members { get; set; }
     }
 }
