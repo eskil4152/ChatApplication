@@ -13,6 +13,9 @@ namespace ChatApplicationServerHttp
                 string method = context.Request.HttpMethod;
                 string path = context.Request.Url.LocalPath;
 
+                Console.WriteLine("Method: " + method);
+                Console.WriteLine("Path: " + path);
+
                 switch (method)
                 {
                     case "GET":

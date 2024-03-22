@@ -15,6 +15,7 @@ namespace ChatApplicationServerHttp
 
             HttpListener listener = new();
             listener.Prefixes.Add("http://192.168.0.135:8083/");
+            listener.Prefixes.Add("http://localhost:8083/");
             listener.Start();
             Console.WriteLine("Listening for HTTP connections...");
 
@@ -27,7 +28,13 @@ namespace ChatApplicationServerHttp
                     await WebSocketRequest.ProcessWebSocketRequest(context, databaseService);
                 } else
                 {
-                    await HttpRequests.ProcessRestRequest(context, databaseService);
+                    if (context.Request.HttpMethod == "OPTIONS")
+                    {
+                        await WriteResponse.WriteOptionsResponse(context);
+                    } else
+                    {
+                        await HttpRequests.ProcessRestRequest(context, databaseService);
+                    }
                 }
             }
         }
