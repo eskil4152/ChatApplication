@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import JoinRoom from "../requests/JoinRoomApi";
+import CreateRoomApi from "../requests/CreateRoomApi";
+import { useState } from "react";
 
-export default function JoinRoomPage() {
+export default function CreateRoomPage() {
   const [roomName, setRoomName] = useState("");
   const [roomPassword, setRoomPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -9,9 +9,10 @@ export default function JoinRoomPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const data = await JoinRoom(roomName, roomPassword);
+    const data = await CreateRoomApi(roomName, roomPassword);
 
-    setMessage(data.status.toString());
+    console.log("data: " + data);
+    //setMessage(data.status.toString());
   }
 
   return (

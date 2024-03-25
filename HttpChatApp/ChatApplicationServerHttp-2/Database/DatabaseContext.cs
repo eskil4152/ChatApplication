@@ -6,10 +6,6 @@ namespace ChatApplicationServerHttp
 {
     public class DatabaseContext : DbContext
     {
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-        {
-        }
-
         public DbSet<User> users { get; set; }
         public DbSet<Room> rooms { get; set; }
         public DbSet<RoomUser> roomuser { get; set; }
