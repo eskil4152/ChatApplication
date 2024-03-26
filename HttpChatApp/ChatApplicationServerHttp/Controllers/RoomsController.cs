@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 
 namespace ChatApplicationServerHttp.Controllers;
 
@@ -58,10 +60,19 @@ public class RoomsController : Controller
     }
 
     [HttpPost("enter")]
-    public IActionResult EnterRoom()
+    public IActionResult EnterRoom([FromQuery] string roomName)
     {
-        return Ok();
+        IRequestCookieCollection cookies = Request.Cookies;
+        if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
+
+        User? user = databaseService.GetUser(Security.Decrypt(usernameCookie, "key"));
+        if (user == null) return Unauthorized();
+
+        Room? room = databaseService.GetRoomByName(roomName);
+        if (room == null || !room.Members.Contains(user.Id)) return NotFound();
+
+        string roomIdentifier = Security.Encrypt(room.Id.ToString(), "key");
+
+        return Ok(roomIdentifier);
     }
 }
-
-

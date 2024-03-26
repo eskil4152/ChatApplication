@@ -13,8 +13,8 @@ namespace ChatApplicationServerHttp
 
         [Key]
         public Guid Id { get; set; }
-        public string? RoomName { get; set; }
-        public string? RoomPassword { get; set; }
+        public required string RoomName { get; set; }
+        public required string RoomPassword { get; set; }
         public required List<string> Messages { get; set; }
 
         public required List<Guid> Members { get; set; }

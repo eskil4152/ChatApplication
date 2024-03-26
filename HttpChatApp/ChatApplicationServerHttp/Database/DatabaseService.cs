@@ -112,14 +112,14 @@ namespace ChatApplicationServerHttp
 			return databaseContext.rooms.FirstOrDefault(r => r.RoomName == roomName);
 		}
 
-		public void GetMessages()
+		public void AddMessageToRoom(Room room, string message)
 		{
-			// get messages from a room
-		}
+			Room? dbRoom = databaseContext.rooms.Find(room);
+			if (dbRoom == null) return;
 
-		public void SaveMessages()
-		{
-			// save new messages to room
+			dbRoom.Messages.Add(message);
+			databaseContext.SaveChanges();
+
 			// perhaps save messages in server and only save once an hour
 		}
 	}

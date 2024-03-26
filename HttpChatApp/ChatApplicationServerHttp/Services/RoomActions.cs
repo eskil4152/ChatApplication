@@ -23,7 +23,7 @@ namespace ChatApplicationServerHttp
             return databaseService.GetRooms(username);
         }
 
-        public static Room? EnterRoom(DatabaseService databaseService, RoomMessage roomMessage, User user, WebSocket socket)
+        public static Room? EnterRoom(DatabaseService databaseService, RoomMessage roomMessage, WebSocket socket)
         {
             //TODO: Check if user actually exists in room
 
@@ -41,16 +41,16 @@ namespace ChatApplicationServerHttp
             return room;
         }
 
-        public static void PostToRoom(DatabaseService databaseService, RoomMessage roomMessage, User user)
+        public static void PostToRoom(DatabaseService databaseService, ChatMessage chatMessage)
         {
-            //TODO: Check if user actually exists in room
-
-            Room? room = databaseService.GetRoomByName(roomMessage.RoomName);
+            Room? room = databaseService.GetRoomByName(chatMessage.RoomName);
             if (room == null) return;
 
-            room.Messages.Add(user.Username + ": " + "Test");
+            string message = chatMessage.Username + ": " + chatMessage.Message;
 
-            _ = UpdateUsersInRoom(room, "Hello");
+            databaseService.AddMessageToRoom(room, message);
+
+            _ = UpdateUsersInRoom(room, message);
         }
 
         private static async Task UpdateUsersInRoom(Room room, string message)
@@ -79,35 +79,9 @@ namespace ChatApplicationServerHttp
             {
                 Console.WriteLine("Error, room should exist in dict");
             }
-            /*Room room = rooms[roomNumber];
-            string jsonMessage = "{\"username\":\"" + user + "\", \"message\":\"" + message + "\"}";
-
-            room.Messages ??= new List<string>();
-
-            room.Messages.Add(jsonMessage);
-
-            foreach (WebSocket client in room.MembersActive)
-            {
-                if (client.State == WebSocketState.Open)
-                {
-                    try
-                    {
-                        await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(jsonMessage)),
-                            WebSocketMessageType.Text, true, CancellationToken.None);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error broadcasting message to client: {ex.Message}");
-                    }
-                }
-                else
-                {
-                    RemoveFromRoom(client, 1);
-                }
-            }*/
         }
 
-        private static async Task RemoveUserFromRoom(Room room, WebSocket socket)
+        public static void RemoveUserFromRoom(Room room, WebSocket socket)
         {
             try
             {

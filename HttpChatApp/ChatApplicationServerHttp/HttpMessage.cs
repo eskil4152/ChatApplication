@@ -6,7 +6,7 @@ public class ChatMessage
 {
     public required string Username { get; set; }
     public required string Message { get; set; }
-    public int? RoomNumber { get; set; }
+    public required string RoomName { get; set; }
 }
 
 public class LoginMessage
@@ -17,6 +17,6 @@ public class LoginMessage
 
 public class RoomMessage
 {
-    public string? RoomName { get; set; }
+    public required string RoomName { get; set; }
     public string? RoomPassword { get; set; }
 }
