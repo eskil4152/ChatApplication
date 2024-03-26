@@ -17,6 +17,7 @@ public class LoginController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginMessage? loginMessage)
     {
+        Console.WriteLine("here123");
         if (loginMessage == null)
         {
             return BadRequest();

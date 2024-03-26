@@ -1,31 +1,24 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Net;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
+
 namespace ChatApplicationServerHttp
 {
-	public class WebSocketMiddleware
+    public class WebSocketMiddleware
 	{
-        private readonly DatabaseService databaseService;
+        private readonly RequestDelegate _next;
+
+        public WebSocketMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+        /*private readonly DatabaseService databaseService;
 
         public WebSocketMiddleware(DatabaseService databaseService)
         {
             this.databaseService = databaseService;
-        }
+        }*/
 
-        private readonly RequestDelegate requestDelegate;
-
-		public WebSocketMiddleware(RequestDelegate requestDelegate)
-		{
-			this.requestDelegate = requestDelegate;
-		}
-
-		public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context)
 		{
 			if (context.WebSockets.IsWebSocketRequest)
 			{
@@ -33,12 +26,12 @@ namespace ChatApplicationServerHttp
                 await HandleWebSocketConnection(context, webSocket);
             } else
 			{
-				await requestDelegate(context);
+                Console.WriteLine("Not ws");
 			}
 		}
 
 		private async Task HandleWebSocketConnection(HttpContext context, WebSocket webSocket) {
-            string? roomQuery = context.Request.Query["room"];
+            /*string? roomQuery = context.Request.Query["room"];
             if (string.IsNullOrEmpty(roomQuery)) return;
 
             Room? room = databaseService.GetRoomByName(roomQuery);
@@ -70,7 +63,6 @@ namespace ChatApplicationServerHttp
                     {
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
                         RoomActions.RemoveUserFromRoom(room, webSocket);
-
                         break;
                     }
                 }
@@ -78,16 +70,9 @@ namespace ChatApplicationServerHttp
                 {
                     Console.WriteLine("An error occurred: " + ex.Message);
                 }
-            }
+            }*/
+            Console.WriteLine("ws conn");
         }
 	}
-
-    public static class WebSocketMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseWebSocketMiddleware(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<WebSocketMiddleware>();
-        }
-    }
 }
 

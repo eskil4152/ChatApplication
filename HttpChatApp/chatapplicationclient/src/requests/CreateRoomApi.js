@@ -1,7 +1,7 @@
 import { postJSON } from "../tools/FetchJson";
 
 export default async function CreateRoomApi(roomName, roomPassword) {
-  return await fetch("http://localhost:8083/api/room/create", {
+  return await fetch("https://localhost:7025/api/room/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

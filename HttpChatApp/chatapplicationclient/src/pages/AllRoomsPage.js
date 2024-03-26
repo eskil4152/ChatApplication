@@ -1,9 +1,7 @@
 import GetAllRooms from "../requests/GetAllRoomsApi";
 
-export default async function AllRooms() {
-  const response = await fetch("https://localhost:7025/api/rooms/all");
-
-  console.log("Res" + response);
+export default function AllRooms() {
+  const { loading, error, response } = GetAllRooms();
 
   while (loading) {
     return (
