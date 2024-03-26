@@ -107,6 +107,11 @@ namespace ChatApplicationServerHttp
 			return databaseContext.users.FirstOrDefault(u => u.Username == username);
 		}
 
+		public Room? GetRoomByName(string roomName)
+		{
+			return databaseContext.rooms.FirstOrDefault(r => r.RoomName == roomName);
+		}
+
 		public void GetMessages()
 		{
 			// get messages from a room
