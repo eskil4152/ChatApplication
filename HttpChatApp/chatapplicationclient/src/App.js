@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
 
-        <Route path="/chat" element={<ChatRoom />} />
+        <Route path="/chat/:room" element={<ChatRoom />} />
         <Route path="/joinroom" element={<JoinRoomPage />} />
         <Route path="/createroom" element={<CreateRoomPage />} />
         <Route path="/rooms" element={<AllRooms />} />

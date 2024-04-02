@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export default function ChatRoom() {
   const [loading, setLoading] = useState(true);
@@ -7,10 +8,10 @@ export default function ChatRoom() {
   const [chatMode, setChatMode] = useState(false);
   var nextId = 0;
 
-  const roomName = "Roome";
+  const { room } = useParams();
 
   useEffect(() => {
-    fetch(`https://localhost:7025/api/rooms/enter?roomName=${roomName}`, {
+    fetch(`https://localhost:7025/api/rooms/enter?roomName=${room}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,6 +24,7 @@ export default function ChatRoom() {
           setLoading(false);
         } else {
           setError("Failed to enter the room. Status: " + response.status);
+          setLoading(false);
         }
       })
       .catch((error) => {
@@ -32,9 +34,7 @@ export default function ChatRoom() {
 
   useEffect(() => {
     if (chatMode) {
-      const webSocket = new WebSocket(
-        `wss://localhost:7025/ws?room=${roomName}`
-      );
+      const webSocket = new WebSocket(`wss://localhost:7025/ws?room=${room}`);
 
       webSocket.onopen = function (event) {
         console.log("WebSocket connection established.");
