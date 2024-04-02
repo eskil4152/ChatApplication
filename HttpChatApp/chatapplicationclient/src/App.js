@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import JoinRoomPage from "./pages/JoinRoomPage";
 import CreateRoomPage from "./pages/CreateRoomPage";
 import AllRooms from "./pages/AllRoomsPage";
-import Tmp from "./pages/Tmp";
+import ChatRoom from "./pages/ChatRoom";
 
 function App() {
   return (
@@ -12,12 +12,22 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
 
-        <Route path="/tmp" element={<Tmp />} />
+        <Route path="/chat" element={<ChatRoom />} />
         <Route path="/joinroom" element={<JoinRoomPage />} />
         <Route path="/createroom" element={<CreateRoomPage />} />
         <Route path="/rooms" element={<AllRooms />} />
+
+        <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
+  );
+}
+
+function NotFound() {
+  return (
+    <div>
+      <h1>Not found</h1>
+    </div>
   );
 }
 
