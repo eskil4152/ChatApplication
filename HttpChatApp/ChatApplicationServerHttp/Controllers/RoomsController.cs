@@ -10,11 +10,13 @@ namespace ChatApplicationServerHttp.Controllers;
 [Route("api/rooms")]
 public class RoomsController : Controller
 {
-    private readonly DatabaseService databaseService;
+    private readonly RoomActions roomActions;
+    private readonly UserActions userActions;
 
-    public RoomsController(DatabaseService databaseService)
+    public RoomsController(RoomActions roomActions, UserActions userActions)
     {
-        this.databaseService = databaseService;
+        this.roomActions = roomActions;
+        this.userActions = userActions;
     }
 
     [HttpGet("all")]
@@ -27,7 +29,7 @@ public class RoomsController : Controller
 
         string decryptedUsername = Security.Decrypt(usernameCookie, "key");
 
-        List<Room> rooms = RoomActions.GetAllRoomsFromUser(databaseService, decryptedUsername);
+        List<Room> rooms = roomActions.GetAllRoomsFromUser(decryptedUsername);
         return Ok(rooms);
     }
 
@@ -37,12 +39,15 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
 
-        User? user = databaseService.GetUser(Security.Decrypt(usernameCookie, "key"));
+        User? user = userActions.GetUser(usernameCookie);
         if (user == null) return Unauthorized();
 
-        databaseService.JoinRoom(roomMessage, user);
+        if (roomActions.JoinRoom(roomMessage, user))
+        {
+            return Ok();
+        }
 
-        return Ok();
+        return NotFound();
     }
 
     [HttpPost("create")]
@@ -51,10 +56,13 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
 
-        User? user = databaseService.GetUser(Security.Decrypt(usernameCookie, "key"));
+        User? user = userActions.GetUser(usernameCookie);
         if (user == null) return Unauthorized();
 
-        databaseService.CreateRoom(roomMessage, user);
+        if(roomActions.CreateRoom(roomMessage, user))
+        {
+            return Ok();
+        }
 
         return Ok();
     }
@@ -65,10 +73,10 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
 
-        User? user = databaseService.GetUser(Security.Decrypt(usernameCookie, "key"));
+        User? user = userActions.GetUser(usernameCookie);
         if (user == null) return Unauthorized();
 
-        Room? room = databaseService.GetRoomByName(roomName);
+        Room? room = roomActions.GetRoomByName(roomName);
         if (room == null || !room.Members.Contains(user.Id)) return NotFound();
 
         string roomIdentifier = Security.Encrypt(room.Id.ToString(), "key");

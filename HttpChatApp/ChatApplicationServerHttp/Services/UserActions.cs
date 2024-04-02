@@ -5,12 +5,19 @@ namespace ChatApplicationServerHttp
 {
 	public class UserActions
 	{
-        public static User? Login(DatabaseService databaseService, LoginMessage loginMessage)
+        private readonly DatabaseService databaseService;
+
+        public UserActions(DatabaseService databaseService)
+        {
+            this.databaseService = databaseService;
+        }
+
+        public User? Login(LoginMessage loginMessage)
         {
             return databaseService.Login(loginMessage.Username, loginMessage.Password);
         }
 
-        public static User? Register(DatabaseService databaseService, LoginMessage loginMessage)
+        public User? Register(LoginMessage loginMessage)
         {
             User user = new()
             {
@@ -19,6 +26,11 @@ namespace ChatApplicationServerHttp
             };
 
             return databaseService.Register(user) ? user : null;
+        }
+
+        public User? GetUser(string encryptedUsername)
+        {
+            return databaseService.GetUser(Security.Decrypt(encryptedUsername, "key"));
         }
     }
 }

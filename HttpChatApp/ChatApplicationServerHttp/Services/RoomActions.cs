@@ -4,26 +4,37 @@ using System.Text;
 
 namespace ChatApplicationServerHttp
 {
-    public static class RoomActions
+    public class RoomActions
     {
-        private static Dictionary<Guid, List<WebSocket>> activeUsers = new();
+        private Dictionary<Guid, List<WebSocket>> activeUsers = new();
+        private readonly DatabaseService databaseService;
 
-        public static bool JoinRoom(DatabaseService databaseService, RoomMessage roomMessage, User user)
+        public RoomActions(DatabaseService databaseService)
+        {
+            this.databaseService = databaseService;
+        }
+
+        public bool JoinRoom(RoomMessage roomMessage, User user)
         {
             return databaseService.JoinRoom(roomMessage, user);
         }
 
-        public static bool CreateRoom(DatabaseService databaseService, RoomMessage roomMessage, User user)
+        public bool CreateRoom(RoomMessage roomMessage, User user)
         {
             return databaseService.CreateRoom(roomMessage, user);
         }
 
-        public static List<Room> GetAllRoomsFromUser(DatabaseService databaseService, string username)
+        public List<Room> GetAllRoomsFromUser(string username)
         {
             return databaseService.GetRooms(username);
         }
 
-        public static Room? EnterRoom(DatabaseService databaseService, RoomMessage roomMessage, WebSocket socket)
+        public Room? GetRoomByName(string roomName)
+        {
+            return databaseService.GetRoomByName(roomName);
+        }
+
+        public Room? EnterRoom(RoomMessage roomMessage, WebSocket socket)
         {
             //TODO: Check if user actually exists in room
 
@@ -41,7 +52,7 @@ namespace ChatApplicationServerHttp
             return room;
         }
 
-        public static void PostToRoom(DatabaseService databaseService, ChatMessage chatMessage)
+        public void PostToRoom(ChatMessage chatMessage)
         {
             Room? room = databaseService.GetRoomByName(chatMessage.RoomName);
             if (room == null) return;
@@ -53,7 +64,7 @@ namespace ChatApplicationServerHttp
             _ = UpdateUsersInRoom(room, message);
         }
 
-        private static async Task UpdateUsersInRoom(Room room, string message)
+        private async Task UpdateUsersInRoom(Room room, string message)
         {
             if (activeUsers.ContainsKey(room.Id))
             {
@@ -81,7 +92,7 @@ namespace ChatApplicationServerHttp
             }
         }
 
-        public static void RemoveUserFromRoom(Room room, WebSocket socket)
+        public void RemoveUserFromRoom(Room room, WebSocket socket)
         {
             try
             {
@@ -92,7 +103,7 @@ namespace ChatApplicationServerHttp
             }
         }
 
-        public static async Task GetAllExistingMessages(WebSocket client, Room room)
+        public async Task GetAllExistingMessages(WebSocket client, Room room)
         {
             try
             {

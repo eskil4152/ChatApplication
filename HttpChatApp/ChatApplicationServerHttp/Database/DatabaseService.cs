@@ -37,7 +37,6 @@ namespace ChatApplicationServerHttp
 				return false;
 			}
 
-
 			Room room = new()
 			{
 				RoomName = roomMessage.RoomName,

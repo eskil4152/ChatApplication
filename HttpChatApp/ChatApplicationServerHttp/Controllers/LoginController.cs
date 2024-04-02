@@ -7,23 +7,24 @@ namespace ChatApplicationServerHttp.Controllers;
 [Route("api")]
 public class LoginController : ControllerBase
 {
-    private readonly DatabaseService databaseService;
+    private readonly UserActions userActions;
+    private readonly RoomActions roomActions;
 
-    public LoginController(DatabaseService databaseService)
+    public LoginController(UserActions userActions, RoomActions roomActions)
     {
-        this.databaseService = databaseService;
+        this.userActions = userActions;
+        this.roomActions = roomActions;
     }
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginMessage? loginMessage)
     {
-        Console.WriteLine("here123");
         if (loginMessage == null)
         {
             return BadRequest();
         }
 
-        User? user = UserActions.Login(databaseService, loginMessage);
+        User? user = userActions.Login(loginMessage);
 
         if (user == null)
         {
@@ -39,10 +40,11 @@ public class LoginController : ControllerBase
         };
 
         Response.Cookies.Append("username", Security.Encrypt(user.Username, "key"), cookieOptions);
-        return Ok(databaseService.GetRooms(user.Username));
+
+        return Ok(roomActions.GetAllRoomsFromUser(user.Username));
     }
 
-    [HttpPost("/register")]
+    [HttpPost("register")]
     public IActionResult Register([FromBody] LoginMessage? loginMessage)
     {
         if (loginMessage == null)
@@ -50,7 +52,7 @@ public class LoginController : ControllerBase
             return BadRequest();
         }
 
-        User? user = UserActions.Register(databaseService, loginMessage);
+        User? user = userActions.Register(loginMessage);
 
         if (user == null)
         {
@@ -66,7 +68,8 @@ public class LoginController : ControllerBase
         };
 
         Response.Cookies.Append("username", Security.Encrypt(user.Username, "key"), cookieOptions);
-        return Ok(databaseService.GetRooms(user.Username));
+
+        return Ok(roomActions.GetAllRoomsFromUser(user.Username));
     }
 }
 

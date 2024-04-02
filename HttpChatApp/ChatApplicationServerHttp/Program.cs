@@ -10,7 +10,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql("Host=localhost;Port=5434;Database=eskil;Username=postgres;Password=password"));
 
+builder.Services.AddScoped<WebSocketMiddleware>();
+
 builder.Services.AddScoped<DatabaseService>();
+builder.Services.AddScoped<RoomActions>();
+builder.Services.AddScoped<UserActions>();
 
 builder.Services.AddCors(options =>
 {
@@ -25,12 +29,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseCors("AllowLocalhost");
 
