@@ -23,7 +23,7 @@ namespace ChatApplicationServerHttp
 
             IRequestCookieCollection cookies = context.Request.Cookies;
             if (!cookies.TryGetValue("username", out string? username) || room == null) return;
-
+            
             while (webSocket.State == WebSocketState.Open)
             {
                 try
@@ -56,9 +56,6 @@ namespace ChatApplicationServerHttp
                     Console.WriteLine("An error occurred: " + ex.Message);
                 }
             }
-            Console.WriteLine("ws conn");
         }
     }
 }
-}
-

@@ -25,7 +25,7 @@ public class WebSocketController : Controller
 		}
 		else
 		{
-			Console.WriteLine("erorr");
+			Console.WriteLine("Request was not a WebSocket request");
 		}
 	}
 }

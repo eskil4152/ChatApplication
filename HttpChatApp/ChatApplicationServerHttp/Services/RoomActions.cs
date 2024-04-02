@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 
 namespace ChatApplicationServerHttp
 {
@@ -74,7 +75,7 @@ namespace ChatApplicationServerHttp
                     {
                         try
                         {
-                            await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)),
+                            await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message))),
                                 WebSocketMessageType.Text, true, CancellationToken.None);
                         }
                         catch (Exception ex)
@@ -105,6 +106,8 @@ namespace ChatApplicationServerHttp
 
         public async Task GetAllExistingMessages(WebSocket client, Room room)
         {
+            List<string> messages = new();
+
             try
             {
                 foreach (string msg in room.Messages)
@@ -115,10 +118,12 @@ namespace ChatApplicationServerHttp
                     }
                     else
                     {
-                        await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)),
-                            WebSocketMessageType.Text, true, CancellationToken.None);
+                        messages.Add(msg);
                     }
                 }
+
+                await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messages))),
+                            WebSocketMessageType.Text, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
