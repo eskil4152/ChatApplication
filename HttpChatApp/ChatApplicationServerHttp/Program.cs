@@ -12,8 +12,8 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 builder.Services.AddScoped<DatabaseService>();
 
-builder.Services.AddScoped<RoomActions>();
-builder.Services.AddScoped<UserActions>();
+builder.Services.AddScoped<RoomService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WebSocketService>();
 
 builder.Services.AddCors(options =>

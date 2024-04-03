@@ -10,13 +10,13 @@ namespace ChatApplicationServerHttp.Controllers;
 [Route("api/rooms")]
 public class RoomsController : Controller
 {
-    private readonly RoomActions roomActions;
-    private readonly UserActions userActions;
+    private readonly RoomService roomService;
+    private readonly UserService userService;
 
-    public RoomsController(RoomActions roomActions, UserActions userActions)
+    public RoomsController(RoomService roomService, UserService userService)
     {
-        this.roomActions = roomActions;
-        this.userActions = userActions;
+        this.roomService = roomService;
+        this.userService = userService;
     }
 
     [HttpGet("all")]
@@ -29,7 +29,7 @@ public class RoomsController : Controller
 
         string decryptedUsername = Security.Decrypt(usernameCookie, "key");
 
-        List<Room> rooms = roomActions.GetAllRoomsFromUser(decryptedUsername);
+        List<Room> rooms = roomService.GetAllRoomsFromUser(decryptedUsername);
         return Ok(rooms);
     }
 
@@ -39,10 +39,10 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
 
-        User? user = userActions.GetUser(usernameCookie);
+        User? user = userService.GetUser(usernameCookie);
         if (user == null) return Unauthorized();
 
-        if (roomActions.JoinRoom(roomMessage, user))
+        if (roomService.JoinRoom(roomMessage, user))
         {
             return Ok();
         }
@@ -56,10 +56,10 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
 
-        User? user = userActions.GetUser(usernameCookie);
+        User? user = userService.GetUser(usernameCookie);
         if (user == null) return Unauthorized();
 
-        if(roomActions.CreateRoom(roomMessage, user))
+        if(roomService.CreateRoom(roomMessage, user))
         {
             return Ok();
         }
@@ -73,10 +73,10 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
 
-        User? user = userActions.GetUser(usernameCookie);
+        User? user = userService.GetUser(usernameCookie);
         if (user == null) return Unauthorized();
 
-        Room? room = roomActions.GetRoomByName(roomName);
+        Room? room = roomService.GetRoomByName(roomName);
         if (room == null || !room.Members.Contains(user.Id)) return NotFound();
 
         string roomIdentifier = Security.Encrypt(room.Id.ToString(), "key");

@@ -7,11 +7,11 @@ namespace ChatApplicationServerHttp
 {
 	public class WebSocketService
 	{
-        private readonly RoomActions roomActions;
+        private readonly RoomService roomService;
 
-        public WebSocketService(RoomActions roomActions)
+        public WebSocketService(RoomService roomService)
         {
-            this.roomActions = roomActions;
+            this.roomService = roomService;
         }
 
         public async Task HandleWebSocketConnection(HttpContext context, WebSocket webSocket)
@@ -19,7 +19,7 @@ namespace ChatApplicationServerHttp
             string? roomQuery = context.Request.Query["room"];
             if (string.IsNullOrEmpty(roomQuery)) return;
 
-            Room? room = roomActions.GetRoomByName(roomQuery);
+            Room? room = roomService.GetRoomByName(roomQuery);
 
             IRequestCookieCollection cookies = context.Request.Cookies;
             if (!cookies.TryGetValue("username", out string? username) || room == null) return;
@@ -42,12 +42,12 @@ namespace ChatApplicationServerHttp
                             RoomName = room.RoomName,
                         };
 
-                        roomActions.PostToRoom(chatMessage);
+                        roomService.PostToRoom(chatMessage);
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-                        roomActions.RemoveUserFromRoom(room, webSocket);
+                        roomService.RemoveUserFromRoom(room, webSocket);
                         break;
                     }
                 }

@@ -3,11 +3,11 @@ using System.Net.WebSockets;
 
 namespace ChatApplicationServerHttp
 {
-	public class UserActions
+	public class UserService
 	{
         private readonly DatabaseService databaseService;
 
-        public UserActions(DatabaseService databaseService)
+        public UserService(DatabaseService databaseService)
         {
             this.databaseService = databaseService;
         }

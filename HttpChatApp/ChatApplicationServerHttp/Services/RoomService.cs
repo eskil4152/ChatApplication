@@ -5,12 +5,12 @@ using System.Text.Json;
 
 namespace ChatApplicationServerHttp
 {
-    public class RoomActions
+    public class RoomService
     {
-        private Dictionary<Guid, List<WebSocket>> activeUsers = new();
+        private readonly Dictionary<Guid, List<WebSocket>> activeUsers = new();
         private readonly DatabaseService databaseService;
 
-        public RoomActions(DatabaseService databaseService)
+        public RoomService(DatabaseService databaseService)
         {
             this.databaseService = databaseService;
         }
@@ -37,8 +37,6 @@ namespace ChatApplicationServerHttp
 
         public Room? EnterRoom(RoomMessage roomMessage, WebSocket socket)
         {
-            //TODO: Check if user actually exists in room
-
             Room? room = databaseService.GetRoomByName(roomMessage.RoomName);
             if (room == null) return null;
 

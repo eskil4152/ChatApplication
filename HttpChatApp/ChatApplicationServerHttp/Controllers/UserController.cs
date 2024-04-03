@@ -7,13 +7,13 @@ namespace ChatApplicationServerHttp.Controllers;
 [Route("api")]
 public class LoginController : ControllerBase
 {
-    private readonly UserActions userActions;
-    private readonly RoomActions roomActions;
+    private readonly UserService userService;
+    private readonly RoomService roomService;
 
-    public LoginController(UserActions userActions, RoomActions roomActions)
+    public LoginController(UserService userService, RoomService roomService)
     {
-        this.userActions = userActions;
-        this.roomActions = roomActions;
+        this.userService = userService;
+        this.roomService = roomService;
     }
 
     [HttpPost("login")]
@@ -24,7 +24,7 @@ public class LoginController : ControllerBase
             return BadRequest();
         }
 
-        User? user = userActions.Login(loginMessage);
+        User? user = userService.Login(loginMessage);
 
         if (user == null)
         {
@@ -41,7 +41,7 @@ public class LoginController : ControllerBase
 
         Response.Cookies.Append("username", Security.Encrypt(user.Username, "key"), cookieOptions);
 
-        return Ok(roomActions.GetAllRoomsFromUser(user.Username));
+        return Ok(roomService.GetAllRoomsFromUser(user.Username));
     }
 
     [HttpPost("register")]
@@ -52,7 +52,7 @@ public class LoginController : ControllerBase
             return BadRequest();
         }
 
-        User? user = userActions.Register(loginMessage);
+        User? user = userService.Register(loginMessage);
 
         if (user == null)
         {
@@ -69,7 +69,7 @@ public class LoginController : ControllerBase
 
         Response.Cookies.Append("username", Security.Encrypt(user.Username, "key"), cookieOptions);
 
-        return Ok(roomActions.GetAllRoomsFromUser(user.Username));
+        return Ok(roomService.GetAllRoomsFromUser(user.Username));
     }
 }
 
