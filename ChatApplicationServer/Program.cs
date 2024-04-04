@@ -28,15 +28,6 @@ builder.Services.AddCors(options =>
                 .AllowCredentials()
                 .AllowAnyMethod();
         });
-
-    options.AddPolicy("AllowNgrok",
-            builder =>
-            {
-                builder.WithOrigins("https://89cf-195-139-192-113.ngrok-free.app")
-                       .AllowAnyHeader()
-                       .AllowCredentials()
-                       .AllowAnyMethod();
-            });
 });
 
 var app = builder.Build();
