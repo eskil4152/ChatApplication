@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import RegisterApi from "../requests/RegisterApi";
 
 export default function RegisterPage() {

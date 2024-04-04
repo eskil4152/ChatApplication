@@ -50,7 +50,7 @@ namespace ChatApplicationServerHttp
             } else
             {
                 Console.WriteLine("Added user to new room");
-                activeUsers.TryAdd(room.Id, new List<WebSocket>() { socket });
+                activeUsers.TryAdd(room.Id, new List<WebSocket> { socket });
 
                 activeUsersService.AddActiveUser(room.Id, socket);
             }
@@ -66,7 +66,10 @@ namespace ChatApplicationServerHttp
         public void PostToRoom(ChatMessage chatMessage)
         {
             Room? room = databaseService.GetRoomByName(chatMessage.RoomName);
-            if (room == null) return;
+            if (room == null) 
+            {
+                return;
+            }
 
             string message = chatMessage.Username + ": " + chatMessage.Message;
 

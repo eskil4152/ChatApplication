@@ -15,7 +15,10 @@ namespace ChatApplicationServerHttp
 		{
 			User? user = databaseContext.users.FirstOrDefault(u => u.Username == username);
 
-			if (user == null) return new List<Room>();
+			if (user == null) 
+			{
+				return new List<Room>();
+			}
 
 			List<Guid> roomIds = databaseContext.roomuser
 				.Where(ru => ru.UserId == user.Id)
@@ -41,8 +44,8 @@ namespace ChatApplicationServerHttp
 			{
 				RoomName = roomMessage.RoomName,
 				RoomPassword = roomMessage.RoomPassword,
-				Messages = new List<string>() { "Welcome to your new room!" },
-				Members = new List<Guid>() { user.Id },
+				Messages = new List<string> { "Welcome to your new room!" },
+				Members = new List<Guid> { user.Id },
 			};
 
             databaseContext.rooms.Add(room);
@@ -114,7 +117,10 @@ namespace ChatApplicationServerHttp
 		public void AddMessageToRoom(Room room, string message)
 		{
 			Room? dbRoom = databaseContext.rooms.Find(room.Id);
-			if (dbRoom == null) return;
+			if (dbRoom == null) 
+			{
+				return;
+			}
 
 			dbRoom.Messages.Add(message);
 			databaseContext.SaveChanges();

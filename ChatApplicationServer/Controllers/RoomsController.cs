@@ -25,7 +25,10 @@ public class RoomsController : Controller
         IRequestCookieCollection cookies = Request.Cookies;
         Console.WriteLine("Cookies" + cookies["username"]);
         
-        if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
+        if (!cookies.TryGetValue("username", out string? usernameCookie)) 
+        {
+            return Unauthorized();
+        }
 
         string decryptedUsername = Security.Decrypt(usernameCookie, "key");
 
@@ -37,10 +40,16 @@ public class RoomsController : Controller
     public IActionResult JoinRoom([FromBody] RoomMessage roomMessage)
     {
         IRequestCookieCollection cookies = Request.Cookies;
-        if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
+        if (!cookies.TryGetValue("username", out string? usernameCookie))
+        {
+            return Unauthorized();   
+        }
 
         User? user = userService.GetUser(usernameCookie);
-        if (user == null) return Unauthorized();
+        if (user == null) 
+        {
+            return Unauthorized();
+        }
 
         if (roomService.JoinRoom(roomMessage, user))
         {
@@ -54,10 +63,16 @@ public class RoomsController : Controller
     public IActionResult CreateRoom([FromBody] RoomMessage roomMessage)
     {
         IRequestCookieCollection cookies = Request.Cookies;
-        if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
+        if (!cookies.TryGetValue("username", out string? usernameCookie)) 
+        {
+            return Unauthorized();
+        }
 
         User? user = userService.GetUser(usernameCookie);
-        if (user == null) return Unauthorized();
+        if (user == null)
+        {
+            return Unauthorized();
+        }
 
         if(roomService.CreateRoom(roomMessage, user))
         {
@@ -71,13 +86,22 @@ public class RoomsController : Controller
     public IActionResult EnterRoom([FromQuery] string roomName)
     {
         IRequestCookieCollection cookies = Request.Cookies;
-        if (!cookies.TryGetValue("username", out string? usernameCookie)) return Unauthorized();
+        if (!cookies.TryGetValue("username", out string? usernameCookie)) 
+        {
+            return Unauthorized();
+        }
 
         User? user = userService.GetUser(usernameCookie);
-        if (user == null) return Unauthorized();
+        if (user == null) 
+        {
+            return Unauthorized();
+        }
 
         Room? room = roomService.GetRoomByName(roomName);
-        if (room == null || !room.Members.Contains(user.Id)) return NotFound();
+        if (room == null || !room.Members.Contains(user.Id)) 
+        {
+            return NotFound();
+        }
 
         return Ok();
     }

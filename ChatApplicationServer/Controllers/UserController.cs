@@ -77,9 +77,15 @@ public class LoginController : ControllerBase
     {
         IRequestCookieCollection cookies = Request.Cookies;
 
-        if (!cookies.TryGetValue("username", out string? username)) return Unauthorized();
+        if (!cookies.TryGetValue("username", out string? username)) 
+        {
+            return Unauthorized();
+        }
 
-        if (userService.GetUser(username) == null) return Unauthorized();
+        if (userService.GetUser(username) == null) 
+        {
+            return Unauthorized();
+        }
 
         return Ok();
     }

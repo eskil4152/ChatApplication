@@ -21,10 +21,8 @@ export default async function fetchJSON(url) {
 }
 
 export async function postJSON(url, content) {
-  var token = localStorage.getItem("token");
-
   try {
-    const response = await fetch("http://localhost:8083" + url, {
+    const response = await fetch("http://localhost:7025" + url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

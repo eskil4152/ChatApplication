@@ -42,11 +42,11 @@ export default function ChatRoom() {
       const webSocket = new WebSocket(`wss://localhost:7025/ws?room=${room}`);
       setSocket(webSocket);
 
-      webSocket.onopen = function (event) {
+      webSocket.onopen = function () {
         console.log("WebSocket connection established.");
       };
 
-      webSocket.onmessage = function (event) {
+      webSocket.onmessage = function () {
         try {
           const serverMessages = JSON.parse(event.data);
           console.log("Ser: " + serverMessages);
@@ -65,7 +65,7 @@ export default function ChatRoom() {
         }
       };
 
-      webSocket.onclose = function (event) {
+      webSocket.onclose = function () {
         console.log("WebSocket connection closed.");
       };
 
