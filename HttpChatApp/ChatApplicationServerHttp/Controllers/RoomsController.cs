@@ -79,8 +79,6 @@ public class RoomsController : Controller
         Room? room = roomService.GetRoomByName(roomName);
         if (room == null || !room.Members.Contains(user.Id)) return NotFound();
 
-        string roomIdentifier = Security.Encrypt(room.Id.ToString(), "key");
-
-        return Ok(roomIdentifier);
+        return Ok();
     }
 }

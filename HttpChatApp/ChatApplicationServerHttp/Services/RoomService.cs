@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -7,7 +8,7 @@ namespace ChatApplicationServerHttp
 {
     public class RoomService
     {
-        private readonly Dictionary<Guid, List<WebSocket>> activeUsers = new();
+        private readonly ConcurrentDictionary<Guid, List<WebSocket>> activeUsers = new();
         private readonly DatabaseService databaseService;
 
         public RoomService(DatabaseService databaseService)
@@ -35,17 +36,16 @@ namespace ChatApplicationServerHttp
             return databaseService.GetRoomByName(roomName);
         }
 
-        public Room? EnterRoom(RoomMessage roomMessage, WebSocket socket)
+        public Room? EnterRoom(Room room, WebSocket socket)
         {
-            Room? room = databaseService.GetRoomByName(roomMessage.RoomName);
-            if (room == null) return null;
-
             if (activeUsers.ContainsKey(room.Id))
             {
+                Console.WriteLine("Added user to existing room");
                 activeUsers[room.Id].Add(socket);
             } else
             {
-                activeUsers.Add(room.Id, new List<WebSocket>() { socket });
+                Console.WriteLine("Added user to new room");
+                activeUsers.TryAdd(room.Id, new List<WebSocket>() { socket });
             }
 
             return room;
@@ -69,11 +69,14 @@ namespace ChatApplicationServerHttp
             {
                 foreach (WebSocket client in activeUsers[room.Id])
                 {
+                    Console.WriteLine("Found client");
                     if (client.State == WebSocketState.Open)
                     {
                         try
                         {
-                            await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message))),
+                            List<string> list = new() { message };
+
+                            await client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(list))),
                                 WebSocketMessageType.Text, true, CancellationToken.None);
                         }
                         catch (Exception ex)

@@ -22,8 +22,17 @@ namespace ChatApplicationServerHttp
             Room? room = roomService.GetRoomByName(roomQuery);
 
             IRequestCookieCollection cookies = context.Request.Cookies;
-            if (!cookies.TryGetValue("username", out string? username) || room == null) return;
-            
+            if (!cookies.TryGetValue("username", out string? usernameEncrypted) || room == null)
+            {
+                await webSocket.CloseAsync(WebSocketCloseStatus.ProtocolError, "Room not specified", CancellationToken.None);
+                Console.WriteLine("Error username or room");
+                return;
+            }
+
+            string username = Security.Decrypt(usernameEncrypted, "key");
+
+            roomService.EnterRoom(room, webSocket);
+
             while (webSocket.State == WebSocketState.Open)
             {
                 try

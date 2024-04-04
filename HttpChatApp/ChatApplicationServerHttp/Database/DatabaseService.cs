@@ -113,7 +113,7 @@ namespace ChatApplicationServerHttp
 
 		public void AddMessageToRoom(Room room, string message)
 		{
-			Room? dbRoom = databaseContext.rooms.Find(room);
+			Room? dbRoom = databaseContext.rooms.Find(room.Id);
 			if (dbRoom == null) return;
 
 			dbRoom.Messages.Add(message);
