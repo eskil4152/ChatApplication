@@ -12,6 +12,7 @@ export default function CreateRoomPage() {
     const data = await CreateRoomApi(roomName, roomPassword);
 
     console.log("data: " + data);
+    setMessage("");
     //setMessage(data.status.toString());
   }
 

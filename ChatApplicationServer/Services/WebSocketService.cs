@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.WebSockets;
 using System.Text;
@@ -17,7 +18,10 @@ namespace ChatApplicationServerHttp
         public async Task HandleWebSocketConnection(HttpContext context, WebSocket webSocket)
         {
             string? roomQuery = context.Request.Query["room"];
-            if (string.IsNullOrEmpty(roomQuery)) return;
+            if (string.IsNullOrEmpty(roomQuery)) 
+            {
+                return;
+            }
 
             Room? room = roomService.GetRoomByName(roomQuery);
 

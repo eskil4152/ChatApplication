@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LoginApi from "../requests/LoginApi";
 
 export default function LoginPage() {

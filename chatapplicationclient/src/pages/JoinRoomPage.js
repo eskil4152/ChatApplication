@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import JoinRoom from "../requests/JoinRoomApi";
 
 export default function JoinRoomPage() {
