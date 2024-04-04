@@ -16,6 +16,8 @@ builder.Services.AddScoped<RoomService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WebSocketService>();
 
+builder.Services.AddSingleton<ActiveUsersService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost",

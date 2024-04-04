@@ -9,11 +9,14 @@ namespace ChatApplicationServerHttp
     public class RoomService
     {
         private readonly ConcurrentDictionary<Guid, List<WebSocket>> activeUsers = new();
-        private readonly DatabaseService databaseService;
 
-        public RoomService(DatabaseService databaseService)
+        private readonly DatabaseService databaseService;
+        private readonly ActiveUsersService activeUsersService;
+
+        public RoomService(DatabaseService databaseService, ActiveUsersService activeUsersService)
         {
             this.databaseService = databaseService;
+            this.activeUsersService = activeUsersService;
         }
 
         public bool JoinRoom(RoomMessage roomMessage, User user)
@@ -42,10 +45,19 @@ namespace ChatApplicationServerHttp
             {
                 Console.WriteLine("Added user to existing room");
                 activeUsers[room.Id].Add(socket);
+
+                activeUsersService.AddActiveUser(room.Id, socket);
             } else
             {
                 Console.WriteLine("Added user to new room");
                 activeUsers.TryAdd(room.Id, new List<WebSocket>() { socket });
+
+                activeUsersService.AddActiveUser(room.Id, socket);
+            }
+
+            foreach (WebSocket s in activeUsers[room.Id])
+            {
+                Console.WriteLine("Fount user");
             }
 
             return room;
@@ -67,7 +79,7 @@ namespace ChatApplicationServerHttp
         {
             if (activeUsers.ContainsKey(room.Id))
             {
-                foreach (WebSocket client in activeUsers[room.Id])
+                foreach (WebSocket client in activeUsersService.GetActiveUsers(room.Id))
                 {
                     Console.WriteLine("Found client");
                     if (client.State == WebSocketState.Open)
