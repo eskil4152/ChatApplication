@@ -38,7 +38,16 @@ export default function AllRooms() {
         <div>
             <h1>OK</h1>
             {response.response.map((room) => (
-                <li key={room.id}>{room.roomName}</li>
+                <div>
+                    <h3>{room.roomName}</h3>
+                    <button
+                        onClick={() => {
+                            window.location.href = "/chat/" + room.roomName;
+                        }}
+                    >
+                        Join
+                    </button>
+                </div>
             ))}
         </div>
     );

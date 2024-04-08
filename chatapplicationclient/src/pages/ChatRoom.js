@@ -56,7 +56,6 @@ export default function ChatRoom() {
             webSocket.onmessage = function (event) {
                 try {
                     const serverMessages = JSON.parse(event.data);
-                    console.log("Ser: " + serverMessages);
 
                     serverMessages.forEach((msg) => {
                         setChats((prevChats) => [
@@ -100,6 +99,10 @@ export default function ChatRoom() {
         }
 
         setUserInput("");
+    }
+
+    if (!chatMode) {
+        return <p>Wait</p>;
     }
 
     return (

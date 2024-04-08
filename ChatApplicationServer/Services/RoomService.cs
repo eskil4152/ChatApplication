@@ -60,6 +60,8 @@ namespace ChatApplicationServerHttp
                 Console.WriteLine("Fount user");
             }
 
+            _ = GetAllExistingMessages(socket, room);
+            
             return room;
         }
 
@@ -128,7 +130,7 @@ namespace ChatApplicationServerHttp
             {
                 foreach (string msg in room.Messages)
                 {
-                    if (client == null || client.State != WebSocketState.Open)
+                    if (client is not { State: WebSocketState.Open })
                     {
                         Console.WriteLine("Client is null or connection is not open.");
                     }
