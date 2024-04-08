@@ -39,7 +39,7 @@ namespace ChatApplicationServerHttp
             return databaseService.GetRoomByName(roomName);
         }
 
-        public Room? EnterRoom(Room room, WebSocket socket)
+        public void EnterRoom(Room room, WebSocket socket)
         {
             if (activeUsers.ContainsKey(room.Id))
             {
@@ -61,8 +61,6 @@ namespace ChatApplicationServerHttp
             }
 
             _ = GetAllExistingMessages(socket, room);
-            
-            return room;
         }
 
         public void PostToRoom(ChatMessage chatMessage)

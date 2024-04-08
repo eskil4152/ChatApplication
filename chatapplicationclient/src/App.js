@@ -85,7 +85,12 @@ function IndexNotLogged() {
 function IndexLogged() {
     return (
         <div>
-            <h1>Logged in</h1>
+            <h1>Hello</h1>
+            <Link to="/rooms">rooms</Link>
+            <br />
+            <Link to="/joinroom">joinroom</Link>
+            <br />
+            <Link to="/createroom">createroom</Link>
         </div>
     );
 }

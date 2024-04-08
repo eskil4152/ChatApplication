@@ -1,17 +1,34 @@
+import JoinRoomApi from "../requests/JoinRoomApi";
 import { useState } from "react";
-import JoinRoom from "../requests/JoinRoomApi";
 
 export default function JoinRoomPage() {
     const [roomName, setRoomName] = useState("");
     const [roomPassword, setRoomPassword] = useState("");
-    const [message, setMessage] = useState("");
+
+    const [error, setError] = useState("");
 
     async function handleSubmit(e) {
         e.preventDefault();
 
-        const data = await JoinRoom(roomName, roomPassword);
+        if (!roomName) {
+            setError("Please enter a name");
+            return;
+        } else if (!roomPassword) {
+            setError("Please enter a password");
+            return;
+        }
 
-        setMessage(data.status.toString());
+        const data = await JoinRoomApi(roomName, roomPassword);
+
+        if (data.status === 200) {
+            window.location.href = "rooms";
+        } else if (data.status === 404) {
+            setError("Room with name '" + roomName + "' not found");
+        } else if (data.status === 401 || data.status === 403) {
+            setError("Unauthorized or forbidden");
+        } else {
+            setError("Unknown error occured");
+        }
     }
 
     return (
@@ -30,7 +47,7 @@ export default function JoinRoomPage() {
                 <button>Confirm</button>
             </form>
 
-            <p>{message}</p>
+            <p>{error}</p>
         </div>
     );
 }
