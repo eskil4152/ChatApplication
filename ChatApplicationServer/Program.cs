@@ -21,9 +21,9 @@ builder.Services.AddSingleton<ActiveUsersService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost",
-        builder =>
+        policyBuilder =>
         {
-            builder.WithOrigins("https://localhost:3000", "https://89cf-195-139-192-113.ngrok-free.app")
+            policyBuilder.WithOrigins("https://localhost:3000")
                 .AllowAnyHeader()
                 .AllowCredentials()
                 .AllowAnyMethod();

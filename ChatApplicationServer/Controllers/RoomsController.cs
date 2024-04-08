@@ -33,6 +33,7 @@ public class RoomsController : Controller
         string decryptedUsername = Security.Decrypt(usernameCookie, "key");
 
         List<Room> rooms = roomService.GetAllRoomsFromUser(decryptedUsername);
+        
         return Ok(rooms);
     }
 
