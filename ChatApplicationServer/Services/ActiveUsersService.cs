@@ -7,7 +7,6 @@ namespace ChatApplicationServerHttp
 	public class ActiveUsersService
 	{
         private readonly ConcurrentDictionary<Guid, List<WebSocket>> activeUsers = new();
-
         public void AddActiveUser(Guid guid, WebSocket webSocket)
         {
             if (activeUsers.ContainsKey(guid))

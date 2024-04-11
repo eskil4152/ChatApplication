@@ -48,18 +48,15 @@ namespace ChatApplicationServerHttp
 				Members = new List<Guid> { user.Id },
 			};
 
-            databaseContext.rooms.Add(room);
-
             RoomUser roomUser = new()
             {
                 UserId = user.Id,
                 RoomId = room.Id
             };
+            
             databaseContext.roomuser.Add(roomUser);
-
-            Console.WriteLine("create: " + JsonSerializer.Serialize(room));
-
 			databaseContext.rooms.Add(room);
+			
             databaseContext.SaveChanges();
 			
 			return true;
@@ -71,7 +68,15 @@ namespace ChatApplicationServerHttp
 
 			if (room != null && room.RoomPassword == roomMessage.RoomPassword)
 			{
+				RoomUser roomUser = new()
+				{
+					UserId = user.Id,
+					RoomId = room.Id
+				};
+				
+				databaseContext.roomuser.Add(roomUser);
 				room.Members.Add(user.Id);
+				
 				databaseContext.SaveChanges();
 
 				return true;

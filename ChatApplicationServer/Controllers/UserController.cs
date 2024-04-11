@@ -34,7 +34,7 @@ public class LoginController : ControllerBase
         CookieOptions cookieOptions = new()
         {
             HttpOnly = true,
-            Secure = true,
+            //Secure = true,
             SameSite = SameSiteMode.None,
             Expires = DateTime.Now.AddDays(1),
         };
@@ -62,7 +62,7 @@ public class LoginController : ControllerBase
         CookieOptions cookieOptions = new()
         {
             HttpOnly = true,
-            Secure = true,
+            //Secure = true,
             SameSite = SameSiteMode.None,
             Expires = DateTime.Now.AddDays(1),
         };
