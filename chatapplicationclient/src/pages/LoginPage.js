@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import LoginApi from "../requests/LoginApi";
 
 export default function LoginPage() {
@@ -39,6 +40,10 @@ export default function LoginPage() {
                 <button>Confirm</button>
             </form>
             <p>{message}</p>
+
+            <br />
+
+            <Link to="/register">Register</Link>
         </div>
     );
 }

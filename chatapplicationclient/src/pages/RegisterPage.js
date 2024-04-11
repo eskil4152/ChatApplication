@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import RegisterApi from "../requests/RegisterApi";
 
 export default function RegisterPage() {
@@ -39,6 +40,8 @@ export default function RegisterPage() {
                 <button>Confirm</button>
             </form>
             <p>{message}</p>
+
+            <Link to="/login">Login</Link>
         </div>
     );
 }
