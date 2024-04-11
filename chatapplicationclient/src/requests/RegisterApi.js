@@ -1,5 +1,5 @@
 export default async function LoginApi(username, password) {
-    return await fetch("https://localhost:7025/api/register", {
+    return await fetch("http://localhost:5062/api/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

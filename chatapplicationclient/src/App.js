@@ -13,7 +13,7 @@ function App() {
     const [loading, setLoading] = useState(true);
 
     async function Authenticate() {
-        const result = await fetch("https://localhost:7025/api/authenticate", {
+        const result = await fetch("http://localhost:5062/api/authenticate", {
             method: "GET",
             credentials: "include",
         });

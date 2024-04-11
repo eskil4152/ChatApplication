@@ -1,5 +1,5 @@
 export default async function JoinRoomApi(roomName, roomPassword) {
-    return await fetch("https://localhost:7025/api/room/join", {
+    return await fetch("http://localhost:5062/api/rooms/join", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

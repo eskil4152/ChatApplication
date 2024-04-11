@@ -15,7 +15,7 @@ export default function ChatRoom() {
     const { room } = useParams();
 
     useEffect(() => {
-        fetch(`https://localhost:7025/api/rooms/enter?roomName=${room}`, {
+        fetch(`http://localhost:5062/api/rooms/enter?roomName=${room}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function ChatRoom() {
     useEffect(() => {
         if (chatMode) {
             const webSocket = new WebSocket(
-                `wss://localhost:7025/ws?room=${room}`
+                `ws://localhost:5062/ws?room=${room}`
             );
             setSocket(webSocket);
 
